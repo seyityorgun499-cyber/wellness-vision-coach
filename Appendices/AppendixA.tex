@@ -1,0 +1,165 @@
+% ============================================================
+%  AppendixA.tex – Ek A: API Uç Noktaları Referansı
+% ============================================================
+\appendix
+\section{API Uç Noktaları Tam Referansı}
+\label{app:api}
+
+Bu ekte, Myora platformunun tüm RESTful API uç noktaları listelenmektedir.
+
+\subsection{Kimlik Doğrulama Rotaları (\texttt{/api/auth})}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Kimlik} & \textbf{Açıklama} \\
+\hline
+POST & /api/auth/register   & --      & Kayıt (email, şifre, ad) \\
+POST & /api/auth/login      & --      & Giriş \\
+POST & /api/auth/logout     & --      & Oturum sonlandırma \\
+GET  & /api/auth/me         & Oturum  & Mevcut kullanıcı bilgisi \\
+PUT  & /api/user/profile    & Oturum  & Profil güncelleme \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Sağlık Takibi Rotaları (\texttt{/api/health})}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\hline
+GET  & /daily-log?date=          & Günlük sağlık özeti \\
+PUT  & /daily-log                & Günlük kayıt upsert \\
+GET  & /daily-log/range          & Tarih aralığı kayıtları \\
+GET  & /food-entries?date=       & Besin girişleri \\
+POST & /food-entries             & Besin girişi ekleme \\
+POST & /analyze-food             & AI yemek fotoğrafı analizi \\
+GET  & /activities?limit=        & Aktivite listesi \\
+POST & /activities               & Aktivite ekleme \\
+GET  & /fasting/active           & Aktif oruç oturumu \\
+POST & /fasting/start            & Oruç başlatma \\
+POST & /fasting/:id/end          & Oruç bitirme \\
+GET  & /fasting/history          & Oruç geçmişi \\
+GET  & /blood-tests              & Kan tahlili listesi \\
+GET  & /blood-tests/:id          & Kan tahlili detay \\
+POST & /blood-tests              & Kan tahlili yükleme + AI analiz \\
+GET  & /documents                & Sağlık belgeleri \\
+POST & /documents                & Belge yükleme + AI analiz \\
+GET  & /medical-photos           & Tıbbi fotoğraflar \\
+POST & /medical-photos           & Tıbbi fotoğraf + AI analiz \\
+GET  & /voice-entries            & Sesli girişler \\
+POST & /voice-entries            & Sesli giriş + AI analiz \\
+GET  & /goals                    & Kullanıcı hedefleri \\
+POST & /goals                    & Hedef oluşturma \\
+PUT  & /goals/:id                & Hedef güncelleme \\
+GET  & /achievements             & Kullanıcı başarımları \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Sohbet (RAG) Rotaları (\texttt{/api/chat})}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\hline
+GET  & /conversations                  & Sohbet listesi \\
+POST & /conversations                  & Yeni sohbet oluştur \\
+GET  & /conversations/:id/messages     & Mesaj geçmişi \\
+POST & /conversations/:id/messages     & Mesaj gönder (RAG yanıt) \\
+GET  & /health-profile                 & Sağlık profili getir \\
+POST & /health-profile/generate        & Sağlık profili üret/güncelle \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Takviye Gıda Rotaları (\texttt{/api/supplements})}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\hline
+GET  & /catalog           & Takviye katalogu \\
+GET  & /recommendations   & Kişisel öneriler \\
+POST & /recommendations   & Öneri oluştur \\
+GET  & /orders            & Sipariş listesi \\
+POST & /orders            & Sipariş oluştur \\
+PUT  & /orders/:id        & Sipariş güncelle \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Topluluk Rotaları (\texttt{/api/community})}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\hline
+GET  & /posts             & Gönderi listesi \\
+GET  & /posts/:id         & Gönderi detay \\
+POST & /posts             & Gönderi oluştur \\
+GET  & /posts/:id/comments& Yorumlar \\
+POST & /posts/:id/comments& Yorum ekle \\
+POST & /posts/:id/like    & Beğeni toggle \\
+DELETE& /posts/:id        & Gönderi sil \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Aile Takibi Rotaları (\texttt{/api/family})}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\hline
+GET  & /members                          & Aile üyeleri \\
+POST & /members                          & Üye ekle \\
+PUT  & /members/:id                      & Üye güncelle \\
+DELETE& /members/:id                     & Üye sil \\
+GET  & /members/:id/medications          & İlaçlar \\
+POST & /members/:id/medications          & İlaç ekle \\
+PUT  & /medications/:id                  & İlaç güncelle \\
+DELETE& /medications/:id                 & İlaç sil \\
+GET  & /medications/:id/logs             & İlaç kayıtları \\
+POST & /medications/:id/logs             & İlaç kaydı ekle \\
+GET  & /members/:id/adherence            & Uyum oranı \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Giyilebilir Cihaz Rotaları (\texttt{/api/wearables})}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\hline
+GET  & /devices              & Cihaz katalogu \\
+GET  & /user-devices         & Kullanıcı cihazları \\
+POST & /user-devices         & Cihaz bağla \\
+DELETE& /user-devices/:id    & Cihaz çıkar \\
+GET  & /data                 & Giyilebilir veri \\
+POST & /data/sync            & Veri senkronizasyonu \\
+\hline
+\end{tabular}
+\end{table}

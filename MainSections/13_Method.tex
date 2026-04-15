@@ -1,0 +1,309 @@
+% ============================================================
+%  13_Method.tex – YÖNTEM
+% ============================================================
+\section{YÖNTEM}
+\label{sec:yontem}
+
+Bu bölümde Myora platformunun sistem mimarisi, kullanılan teknolojiler, veritabanı tasarımı, yapay zekâ servisleri ve geliştirme süreci detaylı olarak açıklanmaktadır.
+
+\subsection{Sistem Mimarisi Genel Bakış}
+
+Myora, dört katmanlı bir monorepo mimarisi üzerine inşa edilmiştir. Şekil~\ref{fig:architecture}'de genel mimari yapı gösterilmektedir.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.85\textwidth}{
+\centering
+\textbf{Myora -- 4 Katmanlı Sistem Mimarisi}\\[8pt]
+\begin{tabular}{|p{0.8\textwidth}|}
+\hline
+\textbf{Mobil Katman} (Capacitor 7.x) \\
+iOS (Swift) $\mid$ Android (Kotlin) \\
+\hline
+\textbf{İstemci Katmanı} (React 18.3 SPA) \\
+Pages $\rightarrow$ Components $\rightarrow$ Hooks $\rightarrow$ Context \\
+$\updownarrow$ REST API (lib/api.ts) \\
+\hline
+\textbf{Sunucu Katmanı} (Express 5.x) \\
+Routes $\rightarrow$ Middleware $\rightarrow$ Services \\
+$\rightarrow$ AI Services (OpenAI GPT-4o) \\
+$\rightarrow$ RAG Pipeline \\
+\hline
+\textbf{Veritabanı Katmanı} \\
+PostgreSQL + Drizzle ORM (17+ tablo) \\
+\hline
+\end{tabular}
+}}
+\caption{Myora platform mimarisi}
+\label{fig:architecture}
+\end{figure}
+
+\subsection{Teknoloji Yığını}
+
+\subsubsection{Ön Yüz (Frontend) Teknolojileri}
+
+Ön yüz katmanı, modern web standartlarına uygun olarak aşağıdaki teknolojiler ile geliştirilmiştir:
+
+\begin{table}[htbp]
+\centering
+\caption{Ön yüz teknoloji yığını}
+\label{tab:frontend_stack}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Teknoloji} & \textbf{Versiyon} & \textbf{Kullanım Amacı} \\
+\hline
+React             & 18.3    & Bileşen tabanlı UI çerçevesi \\
+Vite + SWC        & 5.4     & Hızlı HMR ile geliştirme aracı \\
+TypeScript        & 5.8     & Uçtan uca tip güvenliği \\
+Tailwind CSS      & 3.4     & Yardımcı sınıf tabanlı stilllendirme \\
+Radix UI / shadcn & --      & Erişilebilir, başsız UI bileşenleri \\
+TanStack Query    & 5.x     & Sunucu durumu önbellekleme \\
+React Router DOM  & 6.x     & İstemci tarafı yönlendirme \\
+Recharts          & 2.x     & Veri görselleştirme \\
+Lucide React      & 0.462   & SVG ikon kütüphanesi \\
+react-hook-form   & 7.x     & Form yönetimi \\
+Zod               & 3.x     & Şema doğrulama \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Arka Yüz (Backend) Teknolojileri}
+
+\begin{table}[htbp]
+\centering
+\caption{Arka yüz teknoloji yığını}
+\label{tab:backend_stack}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Teknoloji} & \textbf{Versiyon} & \textbf{Kullanım Amacı} \\
+\hline
+Express            & 5.x    & RESTful API sunucusu \\
+Node.js + TSX      & --     & TypeScript çalışma zamanı \\
+PostgreSQL         & --     & İlişkisel veritabanı \\
+Drizzle ORM        & 0.45   & Tip-güvenli SQL oluşturucu \\
+Drizzle Kit        & 0.31   & Şema push ve migrasyon \\
+express-session    & 1.18   & Oturum yönetimi \\
+connect-pg-simple  & 10.0   & PostgreSQL oturum deposu \\
+bcryptjs           & 3.x    & Parola hashleme (10 tur tuz) \\
+OpenAI SDK         & 6.16   & GPT-4o API entegrasyonu \\
+esbuild            & 0.27   & Üretim sunucu paketleme \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Dizin Yapısı ve Kod Organizasyonu}
+
+Proje, monorepo yapısında organize edilmiş olup paylaşılan şema (\texttt{shared/schema.ts}) hem istemci hem de sunucu tarafından TypeScript yol takma adları (\texttt{@shared/*}) ile erişilebilmektedir.
+
+\begin{verbatim}
+wellness-vision-coach/
+├── client/
+│   └── src/
+│       ├── components/    (30+ UI bileşeni)
+│       ├── contexts/      (Auth, HealthData, Language)
+│       ├── hooks/         (useHealthData, useMobile, useToast)
+│       ├── lib/           (api.ts, utils.ts)
+│       ├── pages/         (Auth, Index, NotFound)
+│       └── services/      (Notification, NativeWidget)
+├── server/
+│   ├── routes/            (auth, health, chat, supplement, ...)
+│   ├── services/          (ai, rag, healthTracking, ...)
+│   └── middleware/        (auth)
+├── shared/
+│   └── schema.ts          (Drizzle ORM şeması)
+└── capacitor.config.ts    (Mobil yapılandırma)
+\end{verbatim}
+
+\subsection{Veritabanı Tasarımı}
+
+Veritabanı şeması, Drizzle ORM kullanılarak \texttt{shared/schema.ts} dosyasında tanımlanmıştır. Tüm tablolar UUID birincil anahtar kullanmaktadır (kullanıcılar tablosu hariç -- otomatik artan serial). Şekil~\ref{fig:er} varlık-ilişki diyagramını göstermektedir.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.9\textwidth}{
+\footnotesize
+\begin{verbatim}
+users (PK: id)
+ ├──< user_devices >── wearable_devices
+ ├──< wearable_data >── wearable_devices
+ ├──< daily_health_logs
+ ├──< food_entries
+ ├──< activity_entries
+ ├──< blood_tests ──< blood_test_results
+ ├──< health_documents
+ ├──< medical_photos
+ ├──< voice_entries
+ ├──< health_profiles (1:1)
+ ├──< chat_conversations ──< chat_messages
+ ├──< supplement_recommendations >── supplements
+ ├──< supplement_orders >── supplements
+ ├──< fasting_logs
+ ├──< community_posts ──< community_comments
+ │                     ──< community_likes
+ ├──< family_members ──< family_medications
+ │                   ──< family_medication_logs
+ ├──< notifications
+ ├──< notification_preferences (1:1)
+ ├──< user_goals
+ └──< user_achievements >── achievements
+\end{verbatim}
+}}
+\caption{Myora veritabanı varlık-ilişki diyagramı}
+\label{fig:er}
+\end{figure}
+
+\subsubsection{Temel Tablolar ve Alanları}
+
+\paragraph{Kullanıcılar Tablosu (\texttt{users}):}
+Kullanıcı kimlik bilgileri, fiziksel ölçüler ve tercihler bu tabloda tutulmaktadır. Temel alanlar: \texttt{id} (serial PK), \texttt{email} (benzersiz), \texttt{password} (bcrypt hash), \texttt{displayName}, \texttt{heightCm}, \texttt{weightKg} (decimal), \texttt{gender}, \texttt{language} (tr/en), \texttt{activityLevel}, \texttt{timezone}, \texttt{onboardingCompleted}.
+
+\paragraph{Günlük Sağlık Kayıtları (\texttt{daily\_health\_logs}):}
+Her kullanıcının günlük sağlık özeti: \texttt{caloriesConsumed}, \texttt{caloriesBurned}, \texttt{caloriesTarget}, \texttt{proteinGrams}, \texttt{waterMl}, \texttt{steps}, \texttt{sleepMinutes}, \texttt{stressLevel} (1--10), \texttt{moodScore} (1--5). \texttt{(userId, date)} çiftinde dizin (index) bulunmaktadır.
+
+\paragraph{Besin Girişleri (\texttt{food\_entries}):}
+\texttt{mealType} (kahvaltı/öğle/akşam/atıştırma), \texttt{foodName}, \texttt{calories}, makro besin değerleri, \texttt{source} (manuel/kamera/barkod/ses) ve \texttt{aiConfidence} alanlarını içermektedir.
+
+\paragraph{Kan Tahlilleri (\texttt{blood\_tests} ve \texttt{blood\_test\_results}):}
+Kan tahlili meta verileri (tarih, laboratuvar, OCR metni, AI özeti, genel durum) ve her bir belirteç sonucu (belirteç adı, değer, birim, referans aralığı, durum, kategori, AI yorumu) ayrı tablolarda tutulmaktadır. Durum alanı \texttt{normal}, \texttt{low}, \texttt{high} veya \texttt{critical} değerlerini alabilmektedir.
+
+\paragraph{Sağlık Profili (\texttt{health\_profiles}):}
+Her kullanıcı için benzersiz (1:1) AI tarafından üretilen sağlık profili: \texttt{bmi}, \texttt{bmr}, \texttt{tdee}, \texttt{bodyFatEstimate}, \texttt{healthScore} (0--100), \texttt{riskFactors} (JSONB), \texttt{nutritionPlan} (JSONB), \texttt{exercisePlan} (JSONB), \texttt{supplementRecommendations} (JSONB), \texttt{aiGeneratedSummary}.
+
+\paragraph{RAG Altyapısı (\texttt{scientific\_sources}, \texttt{chat\_conversations}, \texttt{chat\_messages}):}
+Bilimsel kaynaklar tablosu: başlık, yazarlar, dergi, DOI, özet, tam metin, kategori ve gömme vektörü. Sohbet mesajları tablosunda \texttt{citations} (JSONB) alanı ile kaynak atıfları saklanmaktadır.
+
+\subsection{API Tasarımı}
+
+Sunucu tarafı, 6 rota modülü halinde organize edilmiş olup toplam 80'den fazla RESTful API uç noktası sunmaktadır. Tablo~\ref{tab:api_summary}'de API modülleri özetlenmektedir.
+
+\begin{table}[htbp]
+\centering
+\caption{API modülleri ve uç nokta sayıları}
+\label{tab:api_summary}
+\begin{tabular}{|l|l|c|}
+\hline
+\textbf{Modül} & \textbf{Temel Yol} & \textbf{Uç Nokta} \\
+\hline
+Kimlik Doğrulama & \texttt{/api/auth/*}        & 5 \\
+Sağlık Takibi    & \texttt{/api/health/*}      & 25 \\
+Sohbet (RAG)     & \texttt{/api/chat/*}        & 6 \\
+Takviye Gıda     & \texttt{/api/supplements/*} & 6 \\
+Topluluk         & \texttt{/api/community/*}   & 7 \\
+Aile Takibi      & \texttt{/api/family/*}      & 11 \\
+Giyilebilir Cihaz& \texttt{/api/wearables/*}   & 6 \\
+\hline
+\textbf{Toplam}  &                             & \textbf{66+} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Kimlik Doğrulama ve Oturum Yönetimi}
+
+Kimlik doğrulama, PostgreSQL destekli oturum tabanlı bir mekanizma ile gerçekleştirilmektedir. Kullanıcı şifreleri \texttt{bcryptjs} kütüphanesi ile 10 tur tuz (salt round) kullanılarak hashlenmektedir. Oturum çerezi \texttt{httpOnly} olarak işaretlenmiş olup 30 gün TTL (yaşam süresi) ile yapılandırılmıştır.
+
+Kimlik doğrulama akışı:
+\begin{enumerate}
+    \item Kullanıcı \texttt{POST /api/auth/register} ile kayıt olur (Zod şema doğrulaması),
+    \item Şifre bcrypt ile hashlenerek veritabanına kaydedilir,
+    \item \texttt{POST /api/auth/login} ile giriş yapılır, oturum oluşturulur,
+    \item Korunan rotalar \texttt{requireAuth} middleware'i ile oturum kontrolü yapar,
+    \item \texttt{GET /api/auth/me} ile mevcut oturum doğrulanır.
+\end{enumerate}
+
+\subsection{Yapay Zekâ Servisleri}
+
+Myora'nın yapay zekâ katmanı, OpenAI GPT-4o modeline dayanan 6 ayrı analiz servisi içermektedir. Tüm servisler yapılandırılmış JSON çıktı formatı (\texttt{response\_format: \{type: "json\_object"\}}) kullanmakta ve Türkçe yanıt vermek üzere yapılandırılmıştır.
+
+\begin{table}[htbp]
+\centering
+\caption{Yapay zekâ analiz servisleri}
+\label{tab:ai_services}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Servis} & \textbf{Girdi} & \textbf{Çıktı} \\
+\hline
+\texttt{analyzeFoodImage}    & Base64 fotoğraf       & Besin adı, kalori, makrolar \\
+\texttt{analyzeBloodTest}    & OCR metni             & Belirteçler, durum, öneriler \\
+\texttt{analyzeHealthDoc}    & Belge metni           & Özet, bulgular, etiketler \\
+\texttt{analyzeMedicalPhoto} & Base64 fotoğraf       & Gözlemler, endişeler, aciliyet \\
+\texttt{analyzeVoiceEntry}   & Transkripsiyon        & Duygu, ruh hali, öneriler \\
+\texttt{generateHealthProfile}& Tüm sağlık verileri  & BMI, BMR, TDEE, planlar, skor \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{RAG Chatbot Pipeline}
+
+RAG chatbot, kullanıcının sağlık sorusunu bilimsel kaynaklarla destekleyerek yanıtlayan bir boru hattı (pipeline) mimarisine sahiptir. Şekil~\ref{fig:rag}'te RAG akışı gösterilmektedir.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.85\textwidth}{
+\centering
+\textbf{RAG Chatbot Veri Akışı}\\[8pt]
+Kullanıcı Sorgusu\\
+$\downarrow$\\
+Anahtar Kelime Çıkarma (TR/EN durak kelime filtreleme, maks. 8)\\
+$\downarrow$\\
+Bilimsel Kaynak Erişimi (\texttt{scientific\_sources} tablosunda ILIKE arama)\\
+$\downarrow$\\
+Kullanıcı Bağlamı Oluşturma (Paralel: sağlık profili + kan tahlili + kaynaklar)\\
+$\downarrow$\\
+Sistem İstemi Oluşturma (Rol + 5 kural + kaynaklar + profil)\\
+$\downarrow$\\
+GPT-4o JSON Yanıtı\\
+$\downarrow$\\
+\{content (Markdown), citations[], suggestedFollowUps[]\}
+}}
+\caption{RAG chatbot boru hattı akış diyagramı}
+\label{fig:rag}
+\end{figure}
+
+\subsection{Ön Yüz Bileşen Mimarisi}
+
+İstemci tarafı, 30'dan fazla React bileşeni, 3 bağlam sağlayıcısı (context provider) ve özel kancalar (custom hooks) ile yapılandırılmıştır.
+
+\subsubsection{Navigasyon Yapısı}
+
+Alt navigasyon çubuğu (bottom navigation) 5 ana sekme içermektedir:
+
+\begin{enumerate}
+    \item \textbf{Ana Sayfa} $\rightarrow$ \texttt{HealthDashboard}: Sağlık skoru (0--100), kalori/protein/su ilerleme çemberleri, günlük öneriler,
+    \item \textbf{Günlük} $\rightarrow$ \texttt{AllLogger}: Aktivite kayıt geçmişi,
+    \item \textbf{Hızlı Ekle} $\rightarrow$ Alt sayfa: Kamera, Ses, Belge, Aktivite kısayolları,
+    \item \textbf{Koç} $\rightarrow$ \texttt{CoachHub}: Uzman Sohbet (RAG chatbot) ve Boost (takviye önerileri),
+    \item \textbf{Analiz} $\rightarrow$ \texttt{AnalysisHub}: Sağlık Profili, Giyilebilir Veri, Analitik, Takviyeler, Topluluk, Aile.
+\end{enumerate}
+
+\subsubsection{Durum Yönetimi}
+
+Uygulama durumu üç bağlam sağlayıcısı ile yönetilmektedir:
+
+\begin{itemize}
+    \item \textbf{AuthContext:} Oturum tabanlı kimlik doğrulama durumu (\texttt{user}, \texttt{signIn}, \texttt{signUp}, \texttt{signOut}),
+    \item \textbf{HealthDataContext:} İstemci tarafı sağlık verileri (besin analizleri, sesli girişler, aktiviteler, belgeler, tıbbi fotoğraflar, günlük hedefler, su tüketimi, widget'lar). Günlük kalori ve protein toplamlarını otomatik hesaplar,
+    \item \textbf{LanguageContext:} TR/EN dil tercihi, çeviri sözlüğü (\texttt{t} fonksiyonu), yerel tarih biçimlendirme.
+\end{itemize}
+
+\subsection{Mobil Uygulama Katmanı}
+
+Capacitor 7.x yapılandırması ile web uygulaması yerel iOS ve Android uygulamalarına dönüştürülmektedir. Yapılandırma detayları:
+
+\begin{itemize}
+    \item \textbf{Uygulama Kimliği:} \texttt{com.myora.app}
+    \item \textbf{Uygulama Adı:} Myora
+    \item \textbf{Web Dizini:} \texttt{dist/public}
+    \item \textbf{Eklentiler:} SplashScreen (otomatik gizleme devre dışı)
+    \item \textbf{Yerel Modüller:} @capacitor/preferences (anahtar-değer depolama)
+\end{itemize}
+
+\subsection{Geliştirme Süreci}
+
+Proje, aşamalı bir geliştirme sürecine tabi tutulmuştur:
+
+\begin{enumerate}
+    \item \textbf{Ocak 2025:} İlk prototip, Lovable + Supabase platformunda geliştirilmiştir.
+    \item \textbf{Ocak 2026:} Özelleştirme gereksinimleri nedeniyle Replit tam yığın ortamına (Express + Drizzle ORM) geçiş yapılmıştır.
+    \item \textbf{Şubat 2026:} Capacitor entegrasyonu ile mobil uygulama hazırlığı tamamlanmıştır.
+    \item \textbf{Şubat 2026:} UI/IA (Bilgi Mimarisi) revizyonu ile 5 sekme navigasyon yapısına geçilmiştir.
+\end{enumerate}

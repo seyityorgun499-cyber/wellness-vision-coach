@@ -1,0 +1,48 @@
+% ============================================================
+%  10_Introduction.tex – GİRİŞ
+% ============================================================
+\section{GİRİŞ}
+\label{sec:giris}
+
+\subsection{Problemin Tanımı}
+
+Dijital sağlık teknolojileri son on yılda hızla gelişmekle birlikte, bireylerin sağlık verilerini bütüncül bir bakış açısıyla yönetebilecekleri kapsamlı platformlara olan ihtiyaç her geçen gün artmaktadır. Günümüzde kullanıcılar farklı sağlık verilerini (beslenme, egzersiz, uyku, kan tahlilleri, giyilebilir cihaz verileri) takip etmek için birden fazla uygulama kullanmak zorunda kalmaktadır. Bu durum veri parçalanmasına neden olmakta ve sağlık verilerinin bütüncül bir yapay zekâ analizi ile değerlendirilmesini engellemektedir~\cite{mHealth2023}.
+
+Dünya Sağlık Örgütü'nün (WHO) 2024 raporuna göre, kronik hastalıkların \%80'i sağlıklı yaşam alışkanlıkları ile önlenebilir niteliktedir~\cite{WHO2024}. Ancak bireylerin kendi sağlık verilerini anlamlandırarak doğru kararlar alabilmesi, uzman düzeyinde bilgi ve sürekli takip gerektirmektedir. Yapay zekâ destekli dijital sağlık uygulamaları, bu boşluğu doldurmada kritik bir rol üstlenebilir.
+
+\subsection{Projenin Amacı}
+
+Bu projenin temel amacı, çoklu sağlık verisini yapay zekâ ile analiz ederek kullanıcıya özel beslenme, egzersiz, uyku ve takviye gıda önerileri sunan, mobil-öncelikli bir sağlık yönetim platformu geliştirmektir. Geliştirilen \textbf{Myora} platformu, aşağıdaki hedefleri gerçekleştirmeyi amaçlamaktadır:
+
+\begin{itemize}
+    \item Giyilebilir cihazlar, kan tahlilleri, sağlık belgeleri, yemek fotoğrafları, tıbbi fotoğraflar ve sesli kayıtlar gibi farklı sağlık verisi kaynaklarını tek bir merkezde birleştirmek,
+    \item OpenAI GPT-4o büyük dil modelini kullanarak bu verileri analiz etmek ve kişiselleştirilmiş sağlık önerileri üretmek,
+    \item Retrieval-Augmented Generation (RAG) mimarisi ile bilimsel yayınlarla desteklenen, güvenilir bir yapay zekâ sağlık danışmanı chatbot sunmak,
+    \item Aile üyelerinin ilaç ve takviye kullanım takibini sağlamak,
+    \item Topluluk özellikleri ile kullanıcılar arasında bilgi ve deneyim paylaşımını teşvik etmek.
+\end{itemize}
+
+\subsection{Projenin Kapsamı}
+
+Myora projesi, tam yığın (full-stack) bir web ve mobil uygulama olarak geliştirilmiştir. Proje kapsamında:
+
+\begin{enumerate}
+    \item \textbf{İstemci Katmanı:} React 18.3, TypeScript, Tailwind CSS ve Radix UI / shadcn/ui bileşen kütüphanesi kullanılarak geliştirilen tek sayfa uygulama (SPA),
+    \item \textbf{Sunucu Katmanı:} Express 5 tabanlı RESTful API sunucusu, 80'den fazla API uç noktası,
+    \item \textbf{Veritabanı Katmanı:} PostgreSQL veritabanı, Drizzle ORM ile 17'den fazla tablo,
+    \item \textbf{Mobil Katmanı:} Capacitor 7 ile iOS ve Android platformlarına derleme,
+    \item \textbf{Yapay Zekâ Katmanı:} OpenAI GPT-4o entegrasyonu ile 6 farklı AI analiz servisi ve RAG chatbot
+\end{enumerate}
+yer almaktadır.
+
+\subsection{Raporun Organizasyonu}
+
+Bu raporun geri kalanı aşağıdaki şekilde organize edilmiştir:
+
+\begin{itemize}
+    \item \textbf{Bölüm~\ref{sec:kuramsal}:} Projenin dayandığı kuramsal çerçeve ve temel kavramlar açıklanmaktadır.
+    \item \textbf{Bölüm~\ref{sec:ilgili}:} İlgili çalışmalar ve mevcut dijital sağlık platformları incelenmektedir.
+    \item \textbf{Bölüm~\ref{sec:yontem}:} Sistemin mimarisi, kullanılan teknolojiler ve geliştirme yöntemi detaylandırılmaktadır.
+    \item \textbf{Bölüm~\ref{sec:bulgular}:} Geliştirilen sistemin özellikleri, ekran görüntüleri ve test sonuçları sunulmaktadır.
+    \item \textbf{Bölüm~\ref{sec:sonuc}:} Sonuçlar özetlenmekte ve gelecek çalışmalar tartışılmaktadır.
+\end{itemize}

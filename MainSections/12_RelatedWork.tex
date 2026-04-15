@@ -1,0 +1,64 @@
+% ============================================================
+%  12_RelatedWork.tex – İLGİLİ ÇALIŞMALAR
+% ============================================================
+\section{İLGİLİ ÇALIŞMALAR}
+\label{sec:ilgili}
+
+Bu bölümde, Myora platformu ile benzer amaçlara sahip mevcut dijital sağlık uygulamaları ve akademik çalışmalar incelenmektedir.
+
+\subsection{Mevcut Dijital Sağlık Platformları}
+
+\subsubsection{MyFitnessPal}
+MyFitnessPal, dünya genelinde 200 milyondan fazla kullanıcıya sahip olan bir beslenme ve kalori takip uygulamasıdır. 14 milyondan fazla besin içeren geniş bir veritabanına sahip olup barkod tarama özelliği ile paketli gıdaların besin değerlerini hızlıca kaydetme imkânı sunmaktadır~\cite{MyFitnessPal2024}. Ancak MyFitnessPal, yapay zekâ destekli fotoğraftan besin analizi, kan tahlili yorumlama ve RAG tabanlı bilimsel danışmanlık gibi özellikler sunmamaktadır.
+
+\subsubsection{Flo Health}
+Flo Health, kadın sağlığı odaklı bir uygulama olup âdet döngüsü takibi, hamilelik planlaması ve genel sağlık önerileri sunmaktadır. Yapay zekâ destekli semptom değerlendirme özelliği bulunmakla birlikte, kapsamı kadın sağlığı ile sınırlı kalmaktadır~\cite{Flo2024}.
+
+\subsubsection{Apple Health ve Google Fit}
+Apple Health ve Google Fit, giyilebilir cihaz verilerini toplamak ve görselleştirmek için yaygın olarak kullanılan platform düzeyinde sağlık çerçeveleridir. Bu platformlar veri toplama ve görselleştirmede başarılı olmakla birlikte, kişiselleştirilmiş yapay zekâ analizi, bilimsel kaynaklı chatbot ve topluluk özellikleri sunmamaktadır~\cite{AppleHealth2024}.
+
+\subsubsection{Noom}
+Noom, bilişsel davranışçı terapi (CBT) ilkelerine dayanan bir kilo yönetimi uygulamasıdır. Kullanıcı davranışlarını değiştirmeye odaklanan koçluk programı ile öne çıkmaktadır. Ancak Noom, kan tahlili analizi, tıbbi fotoğraf değerlendirme, aile takibi ve giyilebilir cihaz entegrasyonu gibi kapsamlı sağlık izleme özelliklerinden yoksundur~\cite{Noom2024}.
+
+\subsection{Akademik Çalışmalar}
+
+\subsubsection{Yapay Zekâ Destekli Beslenme Analizi}
+Thames vd.~\cite{Thames2021} tarafından gerçekleştirilen çalışmada, derin öğrenme modellerinin yemek fotoğraflarından besin tanıma ve kalori tahmini yapma performansı incelenmiştir. Çalışma, görüntü tabanlı besin analizinin \%85'in üzerinde doğrulukla gerçekleştirilebildiğini göstermiştir. Myora, bu yaklaşımı GPT-4o'nun çok kipli (multimodal) yetenekleri ile daha da ileri taşımaktadır.
+
+\subsubsection{RAG Mimarisi ile Sağlık Chatbotları}
+Xiong vd.~\cite{Xiong2024} tarafından yapılan araştırmada, RAG mimarisinin tıbbi soru-cevap sistemlerinde halüsinasyonu azaltma ve bilimsel doğruluğu artırma üzerindeki etkisi incelenmiştir. Sonuçlar, RAG tabanlı systemlerin standart LLM yanıtlarına kıyasla \%40'a kadar daha az hatalı bilgi ürettiğini ortaya koymuştur. Myora'nın bilimsel danışman chatbotu, bu bulguları temel alarak geliştirilmiştir.
+
+\subsubsection{Giyilebilir Cihaz Verilerinin Sağlık Yönetiminde Kullanımı}
+Dunn vd.~\cite{Dunn2018} tarafından yürütülen longitudinal çalışmada, giyilebilir cihazlardan toplanan sürekli biyometrik verilerin (kalp atış hızı, cilt sıcaklığı, uyku kalitesi) hastalık başlangıcının erken tespitinde kullanılabileceği gösterilmiştir. Myora, giyilebilir cihaz verilerini yapay zekâ sağlık profili ile birleştirerek benzer bir erken uyarı mekanizması oluşturmayı hedeflemektedir.
+
+\subsection{Karşılaştırmalı Analiz}
+
+Tablo~\ref{tab:comparison} mevcut platformlar ile Myora'nın özelliklerini karşılaştırmaktadır.
+
+\begin{table}[htbp]
+\centering
+\caption{Myora ile Mevcut Platformların Özellik Karşılaştırması}
+\label{tab:comparison}
+\small
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Özellik} & \textbf{Myora} & \textbf{MFP} & \textbf{Flo} & \textbf{Noom} & \textbf{Apple H.} \\
+\hline
+AI Beslenme Analizi          & \checkmark & $\times$ & $\times$ & $\sim$ & $\times$ \\
+Yemek Fotoğraf Tanıma        & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Kan Tahlili AI Analizi        & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+RAG Bilimsel Chatbot          & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Giyilebilir Cihaz Entegr.    & \checkmark & $\sim$ & $\times$ & $\times$ & \checkmark \\
+Tıbbi Fotoğraf Analizi        & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Sesli Günlük                  & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Aile Takibi                   & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Topluluk                      & \checkmark & \checkmark & \checkmark & \checkmark & $\times$ \\
+Aralıklı Oruç Takibi          & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Takviye Gıda Mağazası         & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+\hline
+\end{tabular}
+\\[4pt]
+\footnotesize{\checkmark: Tam destek, $\sim$: Kısmi destek, $\times$: Desteklenmez. MFP: MyFitnessPal, Apple H.: Apple Health}
+\end{table}
+
+Tablo~\ref{tab:comparison}'den görüleceği üzere, Myora mevcut platformların hiçbirinde bir arada bulunmayan kapsamlı bir özellik seti sunmaktadır. Özellikle yapay zekâ destekli kan tahlili analizi, RAG tabanlı bilimsel chatbot ve tıbbi fotoğraf analizi gibi özellikler, Myora'yı mevcut çözümlerden ayırt eden temel farklılıklardır.

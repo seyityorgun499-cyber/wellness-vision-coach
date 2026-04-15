@@ -1,0 +1,76 @@
+% ============================================================
+%  11_Background.tex – KURAMSAL ÇERÇEVE
+% ============================================================
+\section{KURAMSAL ÇERÇEVE}
+\label{sec:kuramsal}
+
+Bu bölümde, Myora platformunun geliştirilmesinde temel alınan kuramsal kavramlar ve teknoloji altyapıları açıklanmaktadır.
+
+\subsection{Dijital Sağlık ve mHealth Kavramı}
+
+Dijital sağlık (digital health), bilgi ve iletişim teknolojilerinin sağlık hizmetlerinin sunumunda, yönetiminde ve iyileştirilmesinde kullanılmasını ifade etmektedir. Mobil sağlık (mHealth) ise dijital sağlığın bir alt kümesi olup, akıllı telefon ve tablet gibi mobil cihazlar aracılığıyla sağlık hizmetlerinin sunulmasını kapsamaktadır~\cite{mHealth2023}.
+
+mHealth uygulamaları genel olarak şu kategorilerde sınıflandırılabilir:
+\begin{itemize}
+    \item \textbf{Sağlık takip uygulamaları:} Beslenme, egzersiz, uyku ve su tüketimi gibi günlük sağlık verilerinin kaydedilmesi,
+    \item \textbf{Kronik hastalık yönetimi:} Diyabet, hipertansiyon gibi kronik rahatsızlıkların izlenmesi,
+    \item \textbf{Giyilebilir cihaz entegrasyonu:} Akıllı saat ve bilekliklerden toplanan biyometrik verilerin analizi,
+    \item \textbf{Yapay zekâ destekli tanı ve öneri sistemleri:} Makine öğrenmesi ve doğal dil işleme ile kişiselleştirilmiş sağlık önerileri.
+\end{itemize}
+
+Myora, yukarıdaki tüm kategorileri tek bir platformda birleştiren kapsamlı bir mHealth uygulaması olarak konumlandırılmıştır.
+
+\subsection{Yapay Zekâ ve Büyük Dil Modelleri}
+
+Büyük dil modelleri (Large Language Models -- LLM), milyarlarca parametre ile eğitilmiş derin öğrenme modelleri olup doğal dil anlama ve üretme görevlerinde insan seviyesine yakın performans sergilemektedir~\cite{OpenAI2023}. OpenAI tarafından geliştirilen GPT-4o modeli, hem metin hem de görüntü girdilerini işleyebilen çok kipli (multimodal) bir modeldir.
+
+Bu projede GPT-4o, aşağıdaki görevlerde kullanılmıştır:
+\begin{enumerate}
+    \item \textbf{Yemek fotoğrafı analizi (görüntü kipi):} Kamera ile çekilen yemek fotoğrafından besin adı, kalori ve makro besin değerlerinin tahmini,
+    \item \textbf{Kan tahlili analizi (metin kipi):} OCR ile dijitalleştirilen kan tahlili sonuçlarından belirteç yorumlama ve sağlık önerileri,
+    \item \textbf{Tıbbi fotoğraf analizi (görüntü kipi):} İdrar, dışkı, dil, göz ve cilt fotoğraflarından ön değerlendirme,
+    \item \textbf{Sesli günlük analizi (metin kipi):} Ses kaydı transkripsiyonundan duygu analizi ve ruh hali tespiti,
+    \item \textbf{Sağlık belgesi analizi (metin kipi):} Tıbbi belgelerin yapay zekâ ile özetlenmesi ve bulguların çıkarılması,
+    \item \textbf{Sağlık profili oluşturma (metin kipi):} Tüm kullanıcı verilerinin birleştirilerek kapsamlı bir sağlık profili ve öneri planı üretilmesi.
+\end{enumerate}
+
+\subsection{Retrieval-Augmented Generation (RAG)}
+
+RAG, büyük dil modellerinin yanıt kalitesini artırmak için bilgi erişim (information retrieval) teknikleri ile üretken yapay zekâyı birleştiren bir mimaridir~\cite{Lewis2020RAG}. Standart bir LLM, yalnızca eğitim verilerine dayanarak yanıt üretirken, RAG mimarisi harici bir bilgi tabanından ilgili belgeleri alarak (retrieval) bunları bağlam olarak modele sunmaktadır.
+
+Myora'nın RAG mimarisi şu adımlardan oluşmaktadır:
+\begin{enumerate}
+    \item \textbf{Anahtar kelime çıkarma:} Kullanıcı sorgusundan Türkçe ve İngilizce durak kelimelerin (stop words) filtrelenmesi ile en fazla 8 anahtar kelime belirlenmesi,
+    \item \textbf{Bilimsel kaynak erişimi:} Anahtar kelimeler kullanılarak \texttt{scientific\_sources} tablosunda tam metin arama yapılması,
+    \item \textbf{Kullanıcı bağlamı oluşturma:} Sağlık profili, kan tahlili sonuçları ve bulunan bilimsel kaynakların paralel olarak getirilmesi,
+    \item \textbf{Sistem istemi (prompt) oluşturma:} Rol tanımı, kurallar, bilimsel kaynaklar ve kullanıcı profili ile zenginleştirilmiş bir sistem istemi hazırlanması,
+    \item \textbf{GPT-4o yanıtı:} Yapılandırılmış JSON formatında yanıt, atıf bilgileri ve önerilen takip soruları.
+\end{enumerate}
+
+\subsection{Modern Web Uygulama Mimarileri}
+
+\subsubsection{Tek Sayfa Uygulama (SPA)}
+SPA mimarisi, sunucudan tek bir HTML sayfası yükleyerek kullanıcı etkileşimlerine JavaScript ile dinamik olarak yanıt veren web uygulama modelidir. React, sanal DOM (Virtual DOM) mekanizması ile verimli UI güncellemeleri sağlamakta ve bileşen tabanlı (component-based) bir geliştirme yaklaşımı sunmaktadır~\cite{React2024}.
+
+\subsubsection{RESTful API Tasarımı}
+REST (Representational State Transfer), istemci-sunucu iletişiminde kaynak odaklı bir mimari stildir. HTTP metotları (GET, POST, PUT, DELETE) ile CRUD operasyonları gerçekleştirilmekte, JSON formatında veri alışverişi yapılmaktadır~\cite{Fielding2000}.
+
+\subsubsection{ORM ve Tip-Güvenli Veritabanı Erişimi}
+Object-Relational Mapping (ORM), veritabanı tablolarını programlama dili nesnelerine eşleyerek SQL sorgularını soyutlayan bir tekniktir. Drizzle ORM, TypeScript'in tip sistemi ile tam uyumlu çalışarak derleme zamanında (compile-time) sorgu hatalarını yakalayabilmektedir~\cite{DrizzleORM2024}.
+
+\subsection{Hibrit Mobil Uygulama Geliştirme}
+
+Hibrit mobil uygulama geliştirme, web teknolojileri (HTML, CSS, JavaScript) ile yazılan uygulamaların yerel (native) bir kapsayıcı (container) içinde çalıştırılarak iOS ve Android platformlarında dağıtılmasını sağlayan yaklaşımdır. Capacitor, Ionic ekibi tarafından geliştirilen modern bir hibrit uygulama çalışma zamanıdır (runtime) ve aşağıdaki avantajları sunmaktadır~\cite{Capacitor2024}:
+
+\begin{itemize}
+    \item Tek kod tabanı ile iOS, Android ve Web platformlarını destekleme,
+    \item Yerel API'lere (kamera, dosya sistemi, bildirimler) JavaScript köprüsü ile erişim,
+    \item Web uygulamasının neredeyse sıfır değişiklikle yerel uygulamaya dönüştürülmesi,
+    \item Swift (iOS) ve Kotlin (Android) ile yerel eklenti geliştirme imkânı.
+\end{itemize}
+
+\subsection{PostgreSQL ve İlişkisel Veritabanı Tasarımı}
+
+PostgreSQL, ACID uyumlu, açık kaynaklı ve nesne-ilişkisel bir veritabanı yönetim sistemidir. JSON/JSONB veri tipi desteği, tam metin arama, dizin (index) optimizasyonları ve genişletilebilir tip sistemi ile modern web uygulamalarında yaygın olarak tercih edilmektedir~\cite{PostgreSQL2024}.
+
+Myora'nın veritabanı şeması, normalleştirme ilkelerine (3NF) uygun olarak tasarlanmış olup 17'den fazla tablo ve bunlar arasındaki yabancı anahtar (foreign key) ilişkilerini kapsamaktadır. JSONB veri tipi, yapılandırılmış AI yanıtlarının (risk faktörleri, beslenme planı, egzersiz planı vb.) esnek bir şekilde depolanmasında kullanılmıştır.

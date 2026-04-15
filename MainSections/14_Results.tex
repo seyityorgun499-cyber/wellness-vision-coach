@@ -1,0 +1,148 @@
+% ============================================================
+%  14_Results.tex – BULGULAR
+% ============================================================
+\section{BULGULAR}
+\label{sec:bulgular}
+
+Bu bölümde, geliştirilen Myora platformunun modül bazında işlevselliği, gerçekleştirilen testler ve elde edilen sonuçlar sunulmaktadır.
+
+\subsection{Gerçekleştirilen Modüller ve Durumları}
+
+Proje kapsamında planlanan 13 temel modülün geliştirme durumları Tablo~\ref{tab:module_status}'de özetlenmektedir.
+
+\begin{table}[htbp]
+\centering
+\caption{Proje modüllerinin geliştirme durumları}
+\label{tab:module_status}
+\small
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{\#} & \textbf{Modül} & \textbf{Durum} & \textbf{Açıklama} \\
+\hline
+1  & AI Sağlık Profili         & Tam     & Backend + Frontend entegre \\
+2  & RAG Chatbot               & Kısmi   & Backend RAG pipeline hazır, frontend mock \\
+3  & Kan Tahlili Analizi       & Tam     & OCR $\rightarrow$ GPT-4o $\rightarrow$ belirteç yorumlama \\
+4  & Yemek Fotoğraf Analizi    & Tam     & Kamera $\rightarrow$ base64 $\rightarrow$ GPT-4o vision \\
+5  & Takviye Gıda Mağazası     & Tam     & Katalog + AI öneriler + sipariş \\
+6  & Aile Takibi               & Tam     & Üye + ilaç + günlük kayıt + uyum \\
+7  & Topluluk                  & Tam     & Gönderi + yorum + beğeni \\
+8  & Giyilebilir Cihaz Entegr. & Kısmi   & Katalog tabanlı, API hazır \\
+9  & Tıbbi Fotoğraf Analizi    & Tam     & 5 fotoğraf tipi + GPT-4o vision \\
+10 & Sesli Günlük              & Kısmi   & Kayıt + mock transkripsiyon \\
+11 & Aralıklı Oruç             & Tam     & 5 plan + zamanlayıcı + seri takibi \\
+12 & Hedefler \& Başarımlar    & Tam     & CRUD + rozet sistemi \\
+13 & Akıllı Bildirimler        & Tam     & Tercih yönetimi + zamanlama \\
+\hline
+\end{tabular}
+\\[4pt]
+\footnotesize{Tam: Backend ve frontend tam entegre, Kısmi: Backend hazır / frontend kısmen entegre}
+\end{table}
+
+\subsection{Yapay Zekâ Analiz Sonuçları}
+
+\subsubsection{Yemek Fotoğraf Analizi}
+
+GPT-4o vision modeli, kamera ile çekilen yemek fotoğraflarını analiz ederek besin adı, toplam kalori, makro besin değerleri (protein, karbonhidrat, yağ) ve sağlık notları döndürmektedir. Sistem ayrıca \texttt{aiConfidence} değeri ile tahmin güvenilirlik oranını raporlamaktadır.
+
+Örnek bir analiz çıktısı:
+\begin{verbatim}
+{
+  "food": "Mercimek Çorbası",
+  "calories": 180,
+  "protein": 12,
+  "carbs": 28,
+  "fat": 3,
+  "fiber": 8,
+  "healthNotes": ["Yüksek lif içeriği", 
+                   "Demir kaynağı"],
+  "confidence": 0.92
+}
+\end{verbatim}
+
+\subsubsection{Kan Tahlili Analizi}
+
+OCR ile dijitalleştirilen kan tahlili metinlerinden belirteçler (markerlar) çıkarılmakta ve her biri referans aralığına göre \texttt{normal}, \texttt{low}, \texttt{high} veya \texttt{critical} olarak sınıflandırılmaktadır. Belirteçler 4 kategoride gruplandırılmaktadır: hematoloji, biyokimya, hormon ve vitamin.
+
+\subsubsection{Tıbbi Fotoğraf Analizi}
+
+Sistem, 5 farklı tipte (idrar, dışkı, dil, göz, cilt) tıbbi fotoğrafı GPT-4o vision ile analiz edebilmektedir. Analiz çıktısı renk değerlendirmesi, gözlemler listesi, endişe noktaları, öneriler ve aciliyet düzeyi (düşük/orta/yüksek/acil) içermektedir.
+
+\subsubsection{Sağlık Profili Oluşturma}
+
+Tüm kullanıcı verileri (fiziksel ölçüler, beslenme kayıtları, egzersiz verileri, kan tahlili sonuçları, giyilebilir cihaz verileri) birleştirilerek kapsamlı bir sağlık profili üretilmektedir. Profil, 0--100 arasında bir sağlık skoru, BMI, BMR ve TDEE hesaplamaları, risk faktörleri, güçlü yönler, iyileştirme alanları, kişisel beslenme planı, egzersiz planı ve takviye gıda önerileri içermektedir.
+
+\subsection{Veritabanı İstatistikleri}
+
+Geliştirilen veritabanı şeması aşağıdaki metrikleri karşılamaktadır:
+
+\begin{table}[htbp]
+\centering
+\caption{Veritabanı istatistikleri}
+\label{tab:db_stats}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metrik} & \textbf{Değer} \\
+\hline
+Toplam tablo sayısı              & 27 \\
+UUID birincil anahtar kullanan   & 26 \\
+JSONB alanı içeren tablo         & 8 \\
+Dizin (index) sayısı             & 12+ \\
+Yabancı anahtar ilişkisi         & 20+ \\
+Enum/kısıtlama kullanan alan     & 35+ \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{API Uç Noktaları ve Test Sonuçları}
+
+Toplam 80'den fazla RESTful API uç noktası geliştirilmiştir. Tüm korunan rotalar, \texttt{requireAuth} middleware'i ile oturum kontrolünden geçmektedir. API yanıtları JSON formatında döndürülmekte ve Zod şema doğrulaması ile girdi validasyonu yapılmaktadır.
+
+\subsection{Ön Yüz Bileşen Sayıları}
+
+\begin{table}[htbp]
+\centering
+\caption{Ön yüz geliştirme metrikleri}
+\label{tab:frontend_metrics}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metrik} & \textbf{Değer} \\
+\hline
+React UI bileşeni          & 30+ \\
+shadcn/ui temel bileşeni   & 50+ \\
+Bağlam sağlayıcısı         & 3 \\
+Özel kanca (hook)          & 3 \\
+API istemci modülü          & 6 \\
+Toplam API metodu           & 56+ \\
+Sayfa bileşeni              & 3 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{RAG Chatbot Performansı}
+
+RAG chatbot mimarisi, bilimsel kaynaklı yanıt üretme yeteneğine sahip olup aşağıdaki özellikleri desteklemektedir:
+
+\begin{itemize}
+    \item Kullanıcı sorgusundan otomatik anahtar kelime çıkarma (maksimum 8),
+    \item Türkçe ve İngilizce durak kelime filtreleme,
+    \item Bilimsel kaynaklar üzerinde tam metin arama (ILIKE),
+    \item Kullanıcının sağlık profili ve kan tahlili sonuçlarının bağlam olarak eklenmesi,
+    \item Markdown formatında zengin içerik yanıtı,
+    \item Atıf bilgileri (\texttt{sourceId}, başlık, alıntı) ile kaynak şeffaflığı,
+    \item Önerilen takip soruları ile etkileşim devamlılığı.
+\end{itemize}
+
+\subsection{Mobil Uygulama Hazırlığı}
+
+Capacitor 7 entegrasyonu tamamlanmış olup uygulama şu platformlara derlenmeye hazırdır:
+
+\begin{itemize}
+    \item \textbf{iOS:} Swift tabanlı yerel sarmalayıcı, \texttt{@capacitor/ios 7.4}
+    \item \textbf{Android:} Kotlin tabanlı yerel sarmalayıcı, \texttt{@capacitor/android 7.4}
+    \item \textbf{Web:} Mevcut Vite build çıktısı ile doğrudan dağıtım
+\end{itemize}
+
+Derleme komutu:
+\begin{verbatim}
+npx cap sync && npx cap open ios  # veya android
+\end{verbatim}

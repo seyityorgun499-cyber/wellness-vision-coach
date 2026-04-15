@@ -1,0 +1,63 @@
+% ============================================================
+%  15_Conclusion.tex – SONUÇ VE ÖNERİLER
+% ============================================================
+\section{SONUÇ VE ÖNERİLER}
+\label{sec:sonuc}
+
+\subsection{Sonuçlar}
+
+Bu bitirme projesi kapsamında, çoklu sağlık verisini yapay zekâ ile analiz ederek kullanıcıya özel sağlık önerileri sunan \textbf{Myora} platformu başarıyla geliştirilmiştir. Projenin temel çıktıları aşağıda özetlenmektedir:
+
+\begin{enumerate}
+    \item \textbf{Kapsamlı sağlık veri birleştirme:} Giyilebilir cihaz verileri, kan tahlilleri, sağlık belgeleri, yemek fotoğrafları, tıbbi fotoğraflar ve sesli günlük kayıtları tek bir platformda başarıyla birleştirilmiştir.
+    
+    \item \textbf{Çok kipli AI analiz:} OpenAI GPT-4o'nun hem metin hem de görüntü analiz yetenekleri kullanılarak 6 farklı yapay zekâ servisi geliştirilmiştir. Bu servisler, yemek fotoğrafı analizi, kan tahlili yorumlama, tıbbi fotoğraf değerlendirme, sesli kayıt analizi, sağlık belgesi özetleme ve kapsamlı sağlık profili oluşturma görevlerini başarıyla yerine getirmektedir.
+    
+    \item \textbf{Bilimsel temelli RAG chatbot:} Retrieval-Augmented Generation mimarisi ile bilimsel yayınlarla desteklenen, atıf bilgisi sunan bir sağlık danışmanı chatbot geliştirilmiştir. Bu yaklaşım, büyük dil modellerinin halüsinasyon riskini azaltarak daha güvenilir sağlık bilgisi sunulmasını sağlamaktadır.
+    
+    \item \textbf{Ölçeklenebilir mimari:} 4 katmanlı monorepo mimarisi, 17'den fazla veritabanı tablosu, 80'den fazla API uç noktası ve 30'dan fazla UI bileşeni ile ölçeklenebilir bir platform oluşturulmuştur.
+    
+    \item \textbf{Çapraz platform desteği:} Capacitor 7 entegrasyonu ile tek kod tabanından web, iOS ve Android platformlarına dağıtım altyapısı hazırlanmıştır.
+    
+    \item \textbf{Aile sağlık yönetimi:} Aile üyelerinin ilaç ve takviye kullanım takibi, uyum analizi ve hatırlatıcı sistemi başarıyla gerçekleştirilmiştir.
+\end{enumerate}
+
+\subsection{Projenin Katkıları}
+
+Myora, mevcut dijital sağlık platformlarına kıyasla aşağıdaki özgün katkıları sunmaktadır:
+
+\begin{itemize}
+    \item Birden fazla sağlık verisi kaynağını tek bir AI merkezinde birleştiren bütüncül yaklaşım,
+    \item GPT-4o'nun çok kipli yeteneklerinin sağlık alanında kapsamlı kullanımı,
+    \item RAG mimarisi ile bilimsel kaynaklara atıf yapabilen sağlık chatbotu,
+    \item Kan tahlili OCR'den otomatik belirteç çıkarma ve yorumlama,
+    \item Tıbbi fotoğraflardan (idrar, dışkı, dil, göz, cilt) AI ön değerlendirme,
+    \item Aile üyelerinin ilaç uyum oranlarının takibi ve görselleştirilmesi.
+\end{itemize}
+
+\subsection{Sınırlılıklar}
+
+Projenin mevcut aşamada bazı sınırlılıkları bulunmaktadır:
+
+\begin{itemize}
+    \item \textbf{Giyilebilir cihaz entegrasyonu:} Gerçek cihaz API'leri (Apple HealthKit, Google Health Connect) ile doğrudan entegrasyon henüz tamamlanmamıştır; mevcut sistem katalog tabanlı çalışmaktadır.
+    \item \textbf{Sesli günlük transkripsiyon:} Gerçek zamanlı konuşmadan metne dönüşüm servisi (Whisper API gibi) henüz entegre edilmemiştir.
+    \item \textbf{RAG chatbot frontend entegrasyonu:} Backend RAG pipeline hazır olmakla birlikte, frontend tarafında hâlâ mock veri kullanılmaktadır.
+    \item \textbf{Klinik doğrulama:} Yapay zekâ analizlerinin tıbbi doğruluğu henüz klinik bir çalışma ile doğrulanmamıştır; sistem bir tıbbi tanı aracı olarak değil, bilgilendirme aracı olarak konumlandırılmıştır.
+    \item \textbf{Barkod tarama:} Barkod tarayıcı UI hazır olmakla birlikte, gerçek ürün veritabanı entegrasyonu tamamlanmamıştır.
+\end{itemize}
+
+\subsection{Gelecek Çalışmalar}
+
+Projenin gelecekte genişletilmesi planlanan alanları şunlardır:
+
+\begin{enumerate}
+    \item \textbf{Apple HealthKit ve Google Health Connect entegrasyonu:} Giyilebilir cihazlardan gerçek zamanlı veri toplama,
+    \item \textbf{OpenAI Whisper API entegrasyonu:} Sesli günlük kayıtlarının otomatik transkripsiyonu,
+    \item \textbf{Bilimsel kaynak veritabanının genişletilmesi:} PubMed API entegrasyonu ile otomatik makale indexleme ve vektör gömme (embedding),
+    \item \textbf{Görüntü tabanlı besin veritabanı:} Yemek fotoğrafı analizinin doğruluğunu artırmak için özel eğitilmiş bir model,
+    \item \textbf{Çevrimdışı (offline) destek:} Capacitor yerel depolama ve Service Worker ile internet bağlantısı olmadan temel işlevsellik,
+    \item \textbf{Çok dilli destek genişletme:} Mevcut TR/EN desteğinin Arapça, Almanca ve Fransızca ile genişletilmesi,
+    \item \textbf{Klinik doğrulama çalışması:} AI analiz doğruluğunun sağlık profesyonelleri ile karşılaştırmalı değerlendirilmesi,
+    \item \textbf{Eczane ve laboratuvar entegrasyonu:} Türkiye'deki eczane ve laboratuvar zincirlerinin API'leri ile doğrudan kan tahlili çekme ve ilaç sipariş entegrasyonu.
+\end{enumerate}

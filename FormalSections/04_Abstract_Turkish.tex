@@ -1,0 +1,34 @@
+% ============================================================
+%  04_Abstract_Turkish.tex – Türkçe Özet
+% ============================================================
+\clearpage
+\thispagestyle{empty}
+
+\begin{center}
+{\Large \textbf{ÖZET}}
+\end{center}
+
+\vspace{0.5cm}
+
+\noindent\textbf{Başlık:} \ttitle
+
+\noindent\textbf{Yazar:} \authorname
+
+\noindent\textbf{Danışman:} \supname
+
+\noindent\textbf{Bölüm:} \dept, \university
+
+\noindent\textbf{Tarih:} \degreedate
+
+\vspace{0.5cm}
+
+Günümüzde bireylerin sağlık verilerini tek bir platformda birleştirerek kişiselleştirilmiş öneriler sunabilen dijital sağlık çözümlerine olan ihtiyaç hızla artmaktadır. Bu projede, çoklu sağlık verisini yapay zekâ ile analiz ederek kullanıcıya özel beslenme, egzersiz, uyku ve takviye gıda önerileri sunan mobil-öncelikli bir sağlık yönetim platformu olan \textbf{Myora} geliştirilmiştir.
+
+Myora, giyilebilir cihaz verileri (nabız, adım, uyku, SpO2, HRV), kan tahlili sonuçları, sağlık belgeleri, yemek fotoğrafları, tıbbi fotoğraflar ve sesli günlük kayıtlarını tek bir yapay zekâ merkezinde birleştirmektedir. Platform, OpenAI GPT-4o büyük dil modelini kullanarak yemek fotoğrafından kalori ve makro besin analizi, kan tahlili OCR metinlerinden belirteç yorumlama, tıbbi fotoğraflardan ön değerlendirme ve sesli kayıtlardan duygu analizi gerçekleştirmektedir.
+
+Sistem, dört katmanlı bir mimari üzerine inşa edilmiştir: React 18.3 tabanlı tek sayfa uygulama (SPA) istemci katmanı, Express 5 RESTful API sunucu katmanı, PostgreSQL veritabanı katmanı ve Capacitor 7 mobil katmanı. Veritabanı şeması, Drizzle ORM kullanılarak tip-güvenli olarak tanımlanmış olup 17'den fazla tablo ve bunlar arasındaki ilişkileri kapsamaktadır. Retrieval-Augmented Generation (RAG) mimarisi ile bilimsel yayınlarla desteklenen bir yapay zekâ sağlık danışmanı chatbot entegre edilmiştir.
+
+Proje kapsamında 13 temel modül (AI sağlık profili, RAG chatbot, kan tahlili analizi, yemek fotoğraf analizi, takviye gıda mağazası, aile takibi, topluluk, giyilebilir cihaz entegrasyonu, tıbbi fotoğraf analizi, sesli günlük, aralıklı oruç, hedefler ve başarımlar, akıllı bildirimler) geliştirilmiş ve 80'den fazla RESTful API uç noktası oluşturulmuştur.
+
+\vspace{0.5cm}
+\noindent\textbf{Anahtar Kelimeler:} \keywordsTR

@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Myora Design System — Professional Health App Palette
+   All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Myora Palette — Clean, professional, health-focused */
+    --background: 220 20% 98%;
+    --background-subtle: 220 14% 96%;
+    --foreground: 222 28% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 28% 14%;
+    --card-hover: 220 14% 97%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 28% 14%;
+
+    /* Primary — Confident Blue */
+    --primary: 222 72% 50%;
+    --primary-light: 222 68% 60%;
+    --primary-dark: 224 70% 44%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary — Soft Teal */
+    --secondary: 186 60% 42%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 186 50% 90%;
+
+    /* Muted tones */
+    --muted: 220 14% 95%;
+    --muted-foreground: 220 8% 46%;
+    --muted-border: 220 12% 88%;
+
+    /* Status colors */
+    --success: 158 60% 40%;
+    --success-light: 158 50% 92%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 36 80% 50%;
+    --warning-light: 42 80% 92%;
+    --warning-foreground: 222 28% 14%;
+
+    --destructive: 0 65% 51%;
+    --destructive-light: 0 70% 94%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Macro colors */
+    --protein: 4 70% 58%;
+    --carbs: 36 80% 50%;
+    --fats: 218 70% 56%;
+    --calories: 222 28% 14%;
+
+    /* Shadows — subtle, professional */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-widget: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-floating: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+
+    --info: 210 92% 45%;
+    --info-light: 210 100% 92%;
+    --info-foreground: 0 0% 100%;
+
+    --accent: 221 83% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --border: 220 16% 88%;
+    --border-strong: 220 16% 78%;
+    --border-subtle: 220 16% 93%;
+    --input: 220 20% 96%;
+    --ring: 221 83% 53%;
+
+    --radius: 1rem;
+
+    /* Sidebar colors */
+    --sidebar-background: 220 33% 99%;
+    --sidebar-foreground: 224 30% 12%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 16% 95%;
+    --sidebar-accent-foreground: 224 30% 12%;
+    --sidebar-border: 220 16% 88%;
+    --sidebar-ring: 221 83% 53%;
+  }
+
+  .dark {
+    --background: 224 28% 10%;
+    --foreground: 220 20% 96%;
+
+    --card: 224 24% 13%;
+    --card-foreground: 220 20% 96%;
+    --card-hover: 224 22% 16%;
+
+    --popover: 224 24% 13%;
+    --popover-foreground: 220 20% 96%;
+
+    --primary: 221 90% 66%;
+    --primary-light: 221 90% 74%;
+    --primary-dark: 221 90% 58%;
+    --primary-foreground: 224 28% 10%;
+    --primary-glow: 221 90% 74%;
+
+    --secondary: 190 85% 62%;
+    --secondary-foreground: 224 28% 10%;
+    --secondary-light: 190 80% 30%;
+
+    --muted: 224 19% 18%;
+    --muted-foreground: 220 12% 70%;
+    --muted-border: 224 19% 24%;
+
+    --success: 152 68% 60%;
+    --success-light: 152 64% 26%;
+    --success-foreground: 224 28% 10%;
+
+    --warning: 35 95% 67%;
+    --warning-light: 35 70% 30%;
+    --warning-foreground: 224 28% 10%;
+
+    --destructive: 0 82% 70%;
+    --destructive-light: 0 72% 34%;
+    --destructive-foreground: 224 28% 10%;
+
+    --info: 210 90% 62%;
+    --info-light: 210 80% 24%;
+    --info-foreground: 224 28% 10%;
+
+    --accent: 221 90% 66%;
+    --accent-foreground: 224 28% 10%;
+
+    --border: 224 19% 24%;
+    --border-strong: 224 19% 34%;
+    --border-subtle: 224 19% 18%;
+    --input: 224 19% 20%;
+    --ring: 221 90% 66%;
+
+    --sidebar-background: 224 28% 10%;
+    --sidebar-foreground: 220 20% 96%;
+    --sidebar-primary: 221 90% 66%;
+    --sidebar-primary-foreground: 224 28% 10%;
+    --sidebar-accent: 224 19% 18%;
+    --sidebar-accent-foreground: 220 20% 96%;
+    --sidebar-border: 224 19% 24%;
+    --sidebar-ring: 221 90% 66%;
+  }
+
+  .black {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 3%;
+    --card-foreground: 0 0% 98%;
+    --card-hover: 0 0% 6%;
+
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-light: 0 0% 85%;
+    --primary-dark: 0 0% 70%;
+    --primary-foreground: 0 0% 9%;
+    --primary-glow: 0 0% 85%;
+
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 9%;
+    --secondary-light: 0 0% 75%;
+
+    --muted: 0 0% 9%;
+    --muted-foreground: 0 0% 63.9%;
+    --muted-border: 0 0% 14.9%;
+
+    --success: 0 0% 85%;
+    --success-light: 0 0% 70%;
+    --success-foreground: 0 0% 9%;
+
+    --warning: 0 0% 85%;
+    --warning-light: 0 0% 70%;
+    --warning-foreground: 0 0% 9%;
+
+    --destructive: 0 0% 85%;
+    --destructive-light: 0 0% 70%;
+    --destructive-foreground: 0 0% 9%;
+
+    --info: 0 0% 75%;
+    --info-light: 0 0% 20%;
+    --info-foreground: 0 0% 9%;
+
+    --accent: 0 0% 85%;
+    --accent-foreground: 0 0% 9%;
+
+    --border: 0 0% 14.9%;
+    --border-strong: 0 0% 25%;
+    --border-subtle: 0 0% 10%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 9%;
+    --sidebar-accent: 0 0% 9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 14.9%;
+    --sidebar-ring: 0 0% 83.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .app-container {
+    @apply min-h-screen bg-background;
+  }
+  
+  .page-container {
+    @apply bg-background text-foreground min-h-screen pb-20;
+  }
+  
+  .card-modern {
+    @apply bg-card rounded-xl border border-border shadow-card transition-shadow duration-200;
+  }
+  
+  .section-header {
+    @apply text-base font-semibold text-foreground mb-3;
+  }
+  
+  .metric-value {
+    @apply text-2xl font-semibold text-foreground;
+  }
+  
+  .metric-label {
+    @apply text-sm text-muted-foreground font-medium;
+  }
+  
+  .nav-active {
+    @apply text-primary font-semibold;
+  }
+  
+  .nav-inactive {
+    @apply text-muted-foreground;
+  }
+
+  /* Keyboard-aware: ensure focused inputs are visible when virtual keyboard opens */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    scroll-margin-bottom: 120px;
+  }
+
+  /* On mobile web, when keyboard opens the viewport shrinks — prevent bottom nav overlap */
+  @supports (height: 100dvh) {
+    .keyboard-aware-container {
+      min-height: 100dvh;
+    }
+  }
+
+  /* Native keyboard height — updated by useKeyboard hook via JS */
+  :root {
+    --keyboard-height: 0px;
+  }
+
+  .page-content {
+    padding-bottom: calc(env(safe-area-inset-bottom) + var(--keyboard-height));
+    transition: padding-bottom 0.25s ease;
+  }
+
+  /* Hide scrollbar but keep scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

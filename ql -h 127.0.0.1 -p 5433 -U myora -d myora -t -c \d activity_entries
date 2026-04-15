@@ -1,0 +1,22 @@
+                              Table "public.activity_entries"
+      Column      |            Type             | Collation | Nullable |      Default      
+------------------+-----------------------------+-----------+----------+-------------------
+ id               | uuid                        |           | not null | gen_random_uuid()
+ user_id          | integer                     |           | not null | 
+ activity_type    | text                        |           | not null | 
+ duration_minutes | integer                     |           | not null | 
+ calories_burned  | integer                     |           |          | 
+ intensity        | text                        |           |          | 'moderate'::text
+ heart_rate_avg   | integer                     |           |          | 
+ heart_rate_max   | integer                     |           |          | 
+ distance_km      | numeric(8,3)                |           |          | 
+ notes            | text                        |           |          | 
+ started_at       | timestamp without time zone |           | not null | 
+ ended_at         | timestamp without time zone |           |          | 
+ created_at       | timestamp without time zone |           | not null | now()
+Indexes:
+    "activity_entries_pkey" PRIMARY KEY, btree (id)
+    "idx_activity_entries_user_date" btree (user_id, started_at)
+Foreign-key constraints:
+    "activity_entries_user_id_users_id_fk" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+

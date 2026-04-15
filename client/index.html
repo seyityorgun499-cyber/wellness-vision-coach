@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="./favicon.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Myora - AI-Powered Health & Nutrition Tracker</title>
+  <!-- Add global error handler to catch silent JS module errors -->
+  <script>
+    window.addEventListener('error', function (e) {
+      var msg = document.createElement('div');
+      msg.style.cssText = 'padding: 20px; font-family: monospace; background: white; color: red; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; border-bottom: 2px solid red;';
+      msg.innerHTML = '<strong>Fatal Error:</strong> ' + e.message + '<br><small>' + e.filename + ':' + e.lineno + '</small>';
+      document.body.appendChild(msg);
+    });
+    window.addEventListener('unhandledrejection', function (e) {
+      var msg = document.createElement('div');
+      msg.style.cssText = 'padding: 20px; font-family: monospace; background: white; color: orange; position: fixed; top: 60px; left: 0; right: 0; z-index: 9999; border-bottom: 2px solid orange;';
+      msg.innerHTML = '<strong>Unhandled Promise:</strong> ' + String(e.reason);
+      document.body.appendChild(msg);
+    });
+  </script>
+  <meta name="description"
+    content="Track your nutrition, upload health documents, get AI-powered insights, and optimize your wellness journey with Myora." />
+  <meta name="keywords"
+    content="myora, health tracker, nutrition analysis, food scanner, health documents, AI health insights, wellness app" />
+  <meta name="author" content="Myora" />
+
+  <meta property="og:title" content="Myora - AI-Powered Health & Nutrition Tracker" />
+  <meta property="og:description"
+    content="Track your nutrition, upload health documents, get AI-powered insights, and optimize your wellness journey with Myora." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@myora_health" />
+  <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+  <!-- Inter Font: loaded via @fontsource/inter in main.tsx (works offline in WebView) -->
+
+  <!-- Myora Theme -->
+  <meta name="theme-color" content="#ffffff" />
+  <style>
+    :root,
+    .light {
+      --background: 0 0% 100%;
+      --foreground: 0 0% 9%;
+      color-scheme: light;
+    }
+
+    html,
+    body,
+    #root {
+      background-color: #ffffff !important;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      color: hsl(var(--foreground, 0 0% 9%));
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
