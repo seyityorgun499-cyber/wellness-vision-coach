@@ -2309,16 +2309,77 @@ export const chatAPI = {
   /** Sağlık profili oluştur / güncelle */
   generateHealthProfile: async (data?: Record<string, unknown>) => {
     const userId = await getCurrentSupabaseUserId();
+    const body = (data ?? {}) as Record<string, any>;
 
-    const { data: fnData, error: fnError } = await supabase.functions.invoke('generate-health-profile', {
-      body: data ?? {},
-    });
+    let result: Record<string, any>;
 
-    if (fnError) {
-      throw new Error(`Sağlık profili oluşturulamadı: ${fnError.message}`);
+    try {
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('generate-health-profile', {
+        body,
+      });
+
+      if (fnError) {
+        console.warn('[generateHealthProfile] Edge function failed, using client fallback:', fnError.message);
+        throw fnError;
+      }
+
+      result = (fnData ?? {}) as Record<string, any>;
+    } catch (_edgeErr) {
+      // ── Client-side fallback profile ──
+      const ud = body.userData as Record<string, any> | undefined;
+      const heightCm = Number(ud?.heightCm ?? 0);
+      const weightKg = Number(ud?.weightKg ?? 0);
+      const age = ud?.dateOfBirth
+        ? Math.floor((Date.now() - new Date(ud.dateOfBirth as string).getTime()) / 31557600000)
+        : 30;
+      const isMale = ud?.gender !== 'female';
+      const bmi = heightCm > 0 && weightKg > 0 ? weightKg / ((heightCm / 100) ** 2) : null;
+      const bmr = heightCm > 0 && weightKg > 0
+        ? Math.round(10 * weightKg + 6.25 * heightCm - 5 * age + (isMale ? 5 : -161))
+        : null;
+      const actMul: Record<string, number> = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, very_active: 1.9 };
+      const tdee = bmr ? Math.round(bmr * (actMul[ud?.activityLevel as string] ?? 1.4)) : null;
+
+      let score = 50;
+      const strengths: string[] = [];
+      const improvements: string[] = [];
+
+      if (bmi && bmi >= 18.5 && bmi <= 24.9) { score += 10; strengths.push('Normal BMI'); }
+      else if (bmi) { improvements.push('BMI normal aralığa getirilmeli'); }
+
+      const foods = (body.todayFood as any[]) ?? [];
+      if (foods.length >= 3) { score += 10; strengths.push('Düzenli öğün takibi'); }
+      else if (foods.length > 0) { score += 5; } else { improvements.push('Günlük öğün takibi yapılmalı'); }
+
+      const waterMl = (body.todayWater as any)?.currentMl ?? 0;
+      const waterTarget = (body.todayWater as any)?.targetMl ?? 2400;
+      if (waterMl >= waterTarget) { score += 10; strengths.push('Yeterli su tüketimi'); }
+      else if (waterMl > 0) { score += 5; improvements.push('Su tüketimi artırılmalı'); }
+      else { improvements.push('Günlük su takibi yapılmalı'); }
+
+      const acts = (body.recentActivities as any[]) ?? [];
+      if (acts.length >= 5) { score += 10; strengths.push('Düzenli fiziksel aktivite'); }
+      else if (acts.length > 0) { score += 5; improvements.push('Fiziksel aktivite artırılmalı'); }
+      else { improvements.push('Egzersiz rutini oluşturulmalı'); }
+
+      const sleepMin = (body.todaySleep as any)?.minutes;
+      if (sleepMin && sleepMin >= 420) { score += 5; strengths.push('Yeterli uyku süresi'); }
+      else if (sleepMin) { improvements.push('Uyku süresi artırılmalı'); }
+
+      result = {
+        bmi: bmi ? Number(bmi.toFixed(1)) : null,
+        bmr, tdee, bodyFatEstimate: null,
+        healthScore: Math.min(score, 100),
+        riskFactors: [],
+        strengths: strengths.length > 0 ? strengths : ['Sağlık takibine başladınız'],
+        improvementAreas: improvements.length > 0 ? improvements : ['Daha fazla veri ile analiz zenginleşecek'],
+        nutritionPlan: tdee ? { dailyCalories: tdee, macroSplit: { protein: 30, carbs: 40, fat: 30 }, mealSuggestions: ['Protein ağırlıklı kahvaltı', 'Lif içeriği yüksek öğle öğünü', 'Dengeli akşam yemeği'] } : null,
+        exercisePlan: { weeklyGoal: 'Haftada en az 150 dakika orta yoğunluklu aktivite', suggestedActivities: ['Yürüyüş', 'Kuvvet antrenmanı', 'Esneme'] },
+        sleepRecommendation: { targetHours: 8, advice: 'Her gün benzer saatte uyuyup uyanmayı hedefleyin.' },
+        supplementRecommendations: [],
+        aiSummary: 'Mevcut verilerinize göre sağlık profili oluşturuldu. Daha fazla veri girdikçe profil daha doğru hale gelecek.',
+      };
     }
-
-    const result = (fnData ?? {}) as Record<string, any>;
     const payload = {
       user_id: userId,
       bmi: result.bmi != null ? String(result.bmi) : null,
