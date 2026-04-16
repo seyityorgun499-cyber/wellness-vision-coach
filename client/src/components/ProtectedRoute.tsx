@@ -11,6 +11,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  // Debug logging
+  console.log('[ProtectedRoute] loading:', loading, 'user?.onboardingCompleted:', user?.onboardingCompleted, 'pathname:', location.pathname);
+
   if (loading) {
     return null;
   }
@@ -19,7 +22,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to={ROUTES.AUTH} replace />;
   }
 
-  if (!user.onboardingCompleted && location.pathname !== ROUTES.ONBOARDING) {
+  // If onboarding status is unknown, wait (will be brief after splash)
+  if (user.onboardingCompleted === undefined) {
+    return null;
+  }
+
+  // Only redirect to onboarding if explicitly not completed
+  if (user.onboardingCompleted === false && location.pathname !== ROUTES.ONBOARDING) {
     return <Navigate to={ROUTES.ONBOARDING} replace />;
   }
 

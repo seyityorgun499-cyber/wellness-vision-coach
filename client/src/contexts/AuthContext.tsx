@@ -81,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .eq('id', authUser.id)
           .maybeSingle()
           .then((r) => r),
-        10000,
+        3000,
         'Profil sorgusu zaman aşımına uğradı',
       );
 
@@ -90,7 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      setUser(mapUser(authUser, result.data));
+      const mappedUser = mapUser(authUser, result.data);
+      logger.log('[AuthContext] Profile loaded, onboardingCompleted:', mappedUser.onboardingCompleted);
+      setUser(mappedUser);
     } catch (err) {
       logger.error('Failed to fetch profile:', err);
       setUser(mapUser(authUser));

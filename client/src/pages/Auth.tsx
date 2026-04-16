@@ -118,15 +118,21 @@ function SignUpForm() {
 }
 
 export default function Auth() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
+      // Redirect to home - ProtectedRoute will handle onboarding check
       navigate('/');
     }
   }, [user, navigate]);
+
+  // Don't render anything while auth is initializing - splash screen handles this
+  if (loading) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

@@ -62,7 +62,7 @@ const Router = isNativeWebView ? HashRouter : BrowserRouter;
 
 const PageFallback = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
-    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+    {/* Loading handled by splash screen */}
   </div>
 );
 
@@ -71,35 +71,27 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
   const { loading } = useAuth();
 
   useEffect(() => {
+    // Minimum 1s splash, maximum 2s - fade out when auth ready
     const minTimer = setTimeout(() => {
       if (!loading) {
         setFadeOut(true);
-        setTimeout(onFinish, 500);
+        setTimeout(onFinish, 300);
       }
-    }, 800);
+    }, 1000);
 
+    // Force finish after 2s regardless
     const maxTimer = setTimeout(() => {
       setFadeOut(true);
-      setTimeout(onFinish, 500);
-    }, 2300);
+      setTimeout(onFinish, 300);
+    }, 2000);
 
     return () => { clearTimeout(minTimer); clearTimeout(maxTimer); };
   }, [onFinish, loading]);
 
-  useEffect(() => {
-    if (!loading) {
-      const timer = setTimeout(() => {
-        setFadeOut(true);
-        setTimeout(onFinish, 500);
-      }, 400);
-      return () => clearTimeout(timer);
-    }
-  }, [loading, onFinish]);
-
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-500"
-      style={{ opacity: fadeOut ? 0 : 1 }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-300"
+      style={{ opacity: fadeOut ? 0 : 1, pointerEvents: fadeOut ? 'none' : 'auto' }}
     >
       <img src={splashLogo} alt="Myora" style={{ width: '70vw', maxWidth: '320px' }} className="animate-fade-in" />
     </div>
@@ -109,6 +101,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
   const dismissSplash = useCallback(() => setShowSplash(false), []);
+  const { loading: authLoading } = useAuth();
 
   return (
     <>
@@ -117,6 +110,10 @@ const AppContent = () => {
       <Sonner />
       {showSplash && <SplashScreen onFinish={dismissSplash} />}
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        {/* Routes render after splash ends. Auth loading happens behind splash. */}
+        {showSplash ? (
+          <div className="fixed inset-0 bg-background z-40" />
+        ) : (
         <ErrorBoundary>
         <Suspense fallback={<PageFallback />}>
           <Routes>
@@ -150,6 +147,7 @@ const AppContent = () => {
           </Routes>
         </Suspense>
         </ErrorBoundary>
+        )}
       </Router>
     </>
   );

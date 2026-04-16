@@ -1,7 +1,25 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import type { Language, TranslationKeys } from '@/lib/i18n';
+import { tr } from '@/lib/i18n/tr';
 
-export type Language = 'en' | 'tr';
+// Static default translations (TR) to avoid flash of untranslated content
+const defaultTranslations = tr;
 
+// Lazy-loaded translations cache
+let cachedEn: Record<string, string> | null = null;
+
+async function loadTranslations(lang: Language): Promise<Record<string, string>> {
+  if (lang === 'en') {
+    if (!cachedEn) {
+      const { en } = await import('@/lib/i18n/en');
+      cachedEn = en;
+    }
+    return cachedEn;
+  }
+  return defaultTranslations;
+}
+
+// Inline translations (migrating to @/lib/i18n for dynamic loading)
 const translations = {
   en: {
     // Food Capture
@@ -1593,3 +1611,6 @@ export const useLanguage = () => {
   }
   return context;
 };
+
+// Re-export types for convenience
+export type { Language, TranslationKeys };

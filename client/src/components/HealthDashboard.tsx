@@ -10,13 +10,15 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { ScoreBreakdownModal, ScoreCategory } from "@/components/ScoreBreakdownModal";
-import { DailyQuests } from "@/components/DailyQuests";
-import { AchievementsBadges } from "@/components/AchievementsBadges";
+import { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspense } from "react";
+import type { ScoreCategory } from "@/components/ScoreBreakdownModal";
+const ScoreBreakdownModal = lazy(() => import("@/components/ScoreBreakdownModal").then(m => ({ default: m.ScoreBreakdownModal })));
+// Lazy load dashboard sections that are below the fold
+const DailyQuests = lazy(() => import("@/components/DailyQuests").then(m => ({ default: m.DailyQuests })));
+const MiniChallenges = lazy(() => import("@/components/MiniChallenges").then(m => ({ default: m.MiniChallenges })));
+const AchievementsBadges = lazy(() => import("@/components/AchievementsBadges").then(m => ({ default: m.AchievementsBadges })));
+const LevelBadge = lazy(() => import("@/components/LevelBadge").then(m => ({ default: m.LevelBadge })));
 import { DailyTip } from "@/components/DailyTip";
-import { LevelBadge } from "@/components/LevelBadge";
-import { MiniChallenges } from "@/components/MiniChallenges";
 import { healthAPI } from "@/lib/api";
 import { useTabNavigate } from "@/hooks/useTabNavigate";
 import { logger } from "@/lib/logger";
@@ -527,12 +529,14 @@ export const HealthDashboard = ({
         </div>
 
         {/* Score Breakdown Modal */}
-        <ScoreBreakdownModal
-          open={showBreakdown}
-          onOpenChange={setShowBreakdown}
-          categories={haloScoreData.categories}
-          totalScore={healthScore}
-        />
+        <Suspense fallback={null}>
+          <ScoreBreakdownModal
+            open={showBreakdown}
+            onOpenChange={setShowBreakdown}
+            categories={haloScoreData.categories}
+            totalScore={healthScore}
+          />
+        </Suspense>
 
         {/* Sign-out confirmation dialog */}
         <AlertDialog open={showSignOutConfirm} onOpenChange={setShowSignOutConfirm}>
@@ -652,22 +656,30 @@ export const HealthDashboard = ({
         })()}
 
         {/* ═══ LEVEL BADGE ═══ */}
-        <LevelBadge
-          foodCount={realFoodCount}
-          activityCount={realActivityCount}
-          waterGlasses={realWaterTarget > 0 ? Math.round(realWaterMl / 300) : 0}
-          voiceCount={realVoiceCount}
-          streak={streakData.currentStreak}
-        />
+        <Suspense fallback={<CardSkeleton className="h-24" />}>
+          <LevelBadge
+            foodCount={realFoodCount}
+            activityCount={realActivityCount}
+            waterGlasses={realWaterTarget > 0 ? Math.round(realWaterMl / 300) : 0}
+            voiceCount={realVoiceCount}
+            streak={streakData.currentStreak}
+          />
+        </Suspense>
 
         {/* ═══ DAILY QUESTS ═══ */}
-        <DailyQuests />
+        <Suspense fallback={<CardSkeleton className="h-32" />}>
+          <DailyQuests />
+        </Suspense>
 
         {/* ═══ MINI CHALLENGES ═══ */}
-        <MiniChallenges />
+        <Suspense fallback={<CardSkeleton className="h-32" />}>
+          <MiniChallenges />
+        </Suspense>
 
         {/* ═══ ACHIEVEMENTS BADGES ═══ */}
-        <AchievementsBadges />
+        <Suspense fallback={<CardSkeleton className="h-24" />}>
+          <AchievementsBadges />
+        </Suspense>
 
         {dataReady && (!user?.heightCm || !user?.weightKg) && (
           <div
