@@ -1,6 +1,10 @@
+% ============================================================
+%  Myora Academic Poster (A0 portrait)
+%  Compile with: pdflatex -interaction=nonstopmode myora_academic_poster.tex
+% ============================================================
 \documentclass[final]{beamer}
 
-\usepackage[orientation=portrait,size=a0,scale=1.08]{beamerposter}
+\usepackage[orientation=portrait,size=a0,scale=1.45]{beamerposter}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[turkish]{babel}
@@ -13,19 +17,26 @@
 \usepackage{tikz}
 \usepackage{xcolor}
 \usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
 
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,fit,calc,babel}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,fit,calc,babel,backgrounds,chains}
 
 \definecolor{myoraBlue}{HTML}{2563EB}
+\definecolor{myoraDeep}{HTML}{0B2A63}
 \definecolor{myoraCyan}{HTML}{06B6D4}
 \definecolor{myoraGreen}{HTML}{10B981}
 \definecolor{myoraPurple}{HTML}{7C3AED}
 \definecolor{myoraOrange}{HTML}{F97316}
 \definecolor{myoraRed}{HTML}{EF4444}
+\definecolor{myoraYellow}{HTML}{F59E0B}
 \definecolor{myoraInk}{HTML}{0F172A}
 \definecolor{myoraMuted}{HTML}{475569}
 \definecolor{myoraPanel}{HTML}{F8FAFC}
 \definecolor{myoraLine}{HTML}{CBD5E1}
+\definecolor{myoraSoft}{HTML}{E2E8F0}
+
+\hypersetup{colorlinks=true,urlcolor=myoraBlue,linkcolor=myoraBlue}
 
 \setbeamertemplate{navigation symbols}{}
 \setbeamercolor{background canvas}{bg=white}
@@ -38,46 +49,84 @@
 
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
 
-\newcommand{\metricbox}[3]{%
-  \begin{tikzpicture}
-    \node[
-      rounded corners=10pt,
-      fill=#1!10,
-      draw=#1!55,
-      line width=1pt,
-      minimum width=0.31\linewidth,
-      minimum height=3.0cm,
-      align=center,
-      inner sep=10pt
-    ] {\textcolor{#1}{\fontsize{28}{30}\selectfont\bfseries #2}\\[-1pt]\small #3};
-  \end{tikzpicture}%
-}
+% --------------------------------------------------------
+% Helper macros
+% --------------------------------------------------------
 
+% Small coloured pill tag
 \newcommand{\tagpill}[2]{%
   \tikz[baseline=(x.base)] \node[
     rounded corners=7pt,
-    fill=#1!12,
-    draw=#1!45,
+    fill=#1!14,
+    draw=#1!55,
     inner xsep=8pt,
     inner ysep=4pt,
     text=myoraInk
   ] (x) {\small #2};%
 }
 
-\newcommand{\layernode}[5]{%
+% Colored feature card (icon letter + title + description)
+\newcommand{\featcard}[4]{%
+  \begin{tikzpicture}
+    \node[
+      rounded corners=10pt,
+      draw=#1!55, fill=#1!10,
+      line width=1pt,
+      minimum width=0.48\linewidth,
+      minimum height=2.8cm,
+      text width=0.44\linewidth,
+      align=left,
+      inner sep=8pt
+    ] {%
+      \textcolor{#1}{\Large\bfseries #2}\ \textbf{#3}\\[-0.15em]
+      {\small #4}%
+    };
+  \end{tikzpicture}%
+}
+
+% Pipeline step box
+\newcommand{\pipestep}[3]{%
   \node[
-    rounded corners=11pt,
-    draw=#1,
-    fill=#1!9,
-    line width=1.2pt,
-    minimum height=2.15cm,
-    text width=#2,
+    rounded corners=8pt,
+    draw=#1!60, fill=#1!12,
+    line width=1pt,
+    minimum height=2.05cm,
+    text width=3.5cm,
     align=center,
-    inner sep=8pt
-  ] (#3) {%
-    \textcolor{#1}{\large #4}\\[-2pt]
-    {\bfseries #5}
-  };
+    inner sep=5pt,
+    font=\small
+  ] (#2) {\textcolor{#1}{\small\bfseries #3}};%
+}
+
+% Data entity box
+\newcommand{\entity}[2]{%
+  \node[
+    rounded corners=6pt,
+    draw=myoraBlue!60,
+    fill=myoraBlue!8,
+    line width=0.9pt,
+    minimum width=6.4cm,
+    minimum height=1.4cm,
+    align=center,
+    font=\small\ttfamily
+  ] (#1) {#2};%
+}
+
+% Horizontal bar (used for RDA chart)
+\newcommand{\rdabar}[3]{%
+  % #1=label, #2=percent (0-100), #3=color
+  \begin{tikzpicture}[yscale=0.7]
+    \draw[rounded corners=3pt, fill=myoraSoft, draw=myoraSoft]
+      (0,0) rectangle (10,0.7);
+    \draw[rounded corners=3pt, fill=#3, draw=#3]
+      (0,0) rectangle ({#2/10},0.7);
+    \node[anchor=east, font=\small\bfseries, text=myoraInk]
+      at (-0.15,0.35) {#1};
+    \node[anchor=west, font=\small, text=myoraMuted]
+      at (10.2,0.35) {#2\%};
+    \draw[dashed, thick, myoraGreen]
+      (10,-0.05) -- (10,0.75);
+  \end{tikzpicture}%
 }
 
 \newenvironment{posterblock}[1]{%
@@ -87,238 +136,371 @@
   \end{block}
 }
 
-\title{Myora: Yapay Zekâ Destekli Mobil Sağlık ve Beslenme Yönetim Platformu}
-\author{Seyit Ali Yorgun \hspace{1em}|\hspace{1em} OSTİM Teknik Üniversitesi -- Yazılım Mühendisliği}
-\institute{React + Capacitor istemci, Supabase arka uç ve RAG tabanlı yapay zekâ mimarisi}
+\title{Myora: Yapay Zekâ Destekli Kişisel Sağlık ve Beslenme Takip Uygulaması}
+\author{Seyit Ali Yorgun}
+\institute{OSTİM Teknik Üniversitesi -- Yazılım Mühendisliği}
 \date{2026}
 
 \begin{document}
 \begin{frame}[t]
 
+% ============================================================
+% HEADER BANNER
+% ============================================================
 \begin{tikzpicture}[remember picture,overlay]
-  \fill[myoraBlue] (current page.north west) rectangle ($(current page.north east)+(0,-8.8cm)$);
-  \fill[myoraCyan!72] ($(current page.north west)+(0,-8.8cm)$) rectangle ($(current page.north east)+(0,-9.15cm)$);
-  \node[anchor=north west, text=white, align=left] at ($(current page.north west)+(3.0cm,-1.35cm)$) {%
-    {\fontsize{44}{48}\selectfont\bfseries Myora}\\[0.25cm]
-    {\fontsize{28}{32}\selectfont Yapay Zekâ Destekli Mobil Sağlık ve Beslenme Yönetim Platformu}\\[0.45cm]
-    {\Large Akademik Proje Yapısı Posteri}};
-  \node[anchor=north east, text=white, align=right] at ($(current page.north east)+(-3.0cm,-1.55cm)$) {%
-    {\Large Seyit Ali Yorgun}\\[0.18cm]
-    {\large Yazılım Mühendisliği}\\[0.18cm]
-    {\large OSTİM Teknik Üniversitesi}\\[0.18cm]
-    {\large 2026}};
-  \node[anchor=north east, draw=white, line width=1.3pt, rounded corners=9pt, inner sep=8pt, fill=white!10] at ($(current page.north east)+(-3.1cm,-5.55cm)$) {%
-    \begin{minipage}{9.0cm}
-      \centering\color{white}\small
-      \textbf{Odak:} mobil-öncelikli, kişiselleştirilmiş sağlık takibi\\
-      \textbf{Çekirdek:} React SPA + Supabase + GPT-4o/RAG
-    \end{minipage}};
+  \fill[myoraDeep] (current page.north west) rectangle
+    ($(current page.north east)+(0,-12cm)$);
+  \fill[myoraCyan!80] ($(current page.north west)+(0,-12cm)$)
+    rectangle ($(current page.north east)+(0,-12.4cm)$);
+
+  % Logo circle on left
+  \node[
+    circle, draw=white, line width=2pt,
+    minimum size=3.6cm, fill=myoraDeep,
+    text=white
+  ] (logo) at ($(current page.north west)+(4.0cm,-4.3cm)$)
+    {\fontsize{38}{42}\selectfont\bfseries M};
+
+  % Title block
+  \node[anchor=north west, text=white, align=left]
+    at ($(current page.north west)+(6.8cm,-1.6cm)$) {%
+      {\fontsize{58}{62}\selectfont\bfseries MYORA}\\[0.2cm]
+      {\fontsize{24}{28}\selectfont Yapay Zekâ Destekli Kişisel Sağlık ve Beslenme Takip Uygulaması}\\[0.45cm]
+      \tikz\node[rounded corners=6pt,fill=myoraGreen!85,inner xsep=9pt,inner ysep=4pt,text=white]{\small\bfseries Bilgisayarlı Görü};\ %
+      \tikz\node[rounded corners=6pt,fill=myoraOrange!85,inner xsep=9pt,inner ysep=4pt,text=white]{\small\bfseries Doğal Dil İşleme};\ %
+      \tikz\node[rounded corners=6pt,fill=myoraPurple!85,inner xsep=9pt,inner ysep=4pt,text=white]{\small\bfseries Kişiselleştirilmiş RDA Motoru};
+    };
+
+  % Center subtitle area (lower half of banner)
+  \node[anchor=center, text=white!95, align=center]
+    at ($(current page.north)+(0,-9.0cm)$) {%
+      {\large\bfseries Çok Platformlu Mobil Uygulama}\\[0.35cm]
+      {\small React 18 + TypeScript\ \ \textbullet\ \ Capacitor 7\ \ \textbullet\ \ Supabase + Edge Functions\ \ \textbullet\ \ OpenAI GPT-4o (çok modlu)}
+    };
+
+  % Tech stack on the right
+  \node[anchor=north east, text=white, align=right]
+    at ($(current page.north east)+(-3.0cm,-1.2cm)$) {%
+      {\normalsize\bfseries Teknoloji Yığını}\\[0.2cm]
+      {\small \textbullet\ Android ve iOS (Capacitor 7)}\\[0.05cm]
+      {\small \textbullet\ React 18 + TypeScript + Vite}\\[0.05cm]
+      {\small \textbullet\ Supabase (PostgreSQL + Edge)}\\[0.05cm]
+      {\small \textbullet\ OpenAI GPT-4o Vision API}\\[0.05cm]
+      {\small \textbullet\ RAG (pgvector) + Zod}\\[0.05cm]
+      {\small \textbullet\ TanStack Query + shadcn/ui}%
+    };
 \end{tikzpicture}
 
-\vspace*{9.4cm}
+\vspace*{12.6cm}
 
+% ============================================================
+% COLUMNS
+% ============================================================
 \begin{columns}[t,totalwidth=\textwidth]
 
+% ============================================================
+% COLUMN 1
+% ============================================================
 \begin{column}{0.32\textwidth}
 
-\begin{posterblock}{Problem ve Amaç}
-\textbf{Problem:} Kişisel sağlık verileri çoğunlukla farklı uygulamalarda dağınık tutulur; beslenme, kan tahlili, giyilebilir cihaz, aile takibi ve günlük alışkanlıklar arasında bütüncül yorum üretmek zordur.
+\begin{posterblock}{Özet}
+\small
+\textbf{Myora}, yapay zekâ bilgisayarlı görüsü, doğal dil işleme ve kişiselleştirilmiş bir besin motorunun birleşimiyle manuel sağlık kaydının önündeki engelleri kaldıran çok platformlu bir sağlık ve beslenme takip uygulamasıdır.
 
-\textbf{Amaç:} Myora, çoklu veri kaynağını tek mobil arayüzde toplayarak yapay zekâ destekli sağlık profili, kaynaklı RAG sohbeti, beslenme analizi, takviye önerileri ve hatırlatıcılar sunan modüler bir platform geliştirmeyi hedefler.
+Kullanıcılar yemeklerini fotoğraflayarak anlık makro besin dökümü alabilir, sesli girdiyle günlük tutabilir, kan tahlili ve tıbbi belgeleri yapay zekâya analiz ettirebilir ve sonuçlara göre kişiselleştirilmiş takviye önerileri elde edebilir.
 
-\vspace{0.4cm}
-\tagpill{myoraBlue}{Mobil öncelikli}
-\tagpill{myoraGreen}{Kişiselleştirilmiş sağlık}
-\tagpill{myoraPurple}{Kaynaklı AI danışman}
-\tagpill{myoraOrange}{Gamifikasyon}
+Sistem; Android ve iOS için \textbf{Capacitor} ile paketlenmiş bir React istemci, \textbf{Supabase} bulut altyapısı (PostgreSQL + Edge Functions) ve \textbf{OpenAI GPT-4o} çok modlu API üzerine kurulmuştur.
+\end{posterblock}
+
+\begin{posterblock}{Problem Tanımı}
+\small
+Geleneksel sağlık takip uygulamaları birçok sorundan muzdariptir:
+\begin{itemize}\setlength{\itemsep}{0.15em}
+  \item \textcolor{myoraRed}{\textbf{Yüksek manuel yük}}\,--\,kullanıcı her yiyeceği arayıp elle girmek zorundadır.
+  \item \textcolor{myoraRed}{\textbf{Genel öneriler}}\,--\,herkese uyan tek kalori hedefi yaş, cinsiyet, VKİ, aktivite ve kan biyobelirteçlerini göz ardı eder.
+  \item \textcolor{myoraRed}{\textbf{Parçalı veriler}}\,--\,beslenme, aktivite, belge ve giyilebilir cihazlar ayrı silolarda yaşar.
+  \item \textcolor{myoraRed}{\textbf{Düşük sürdürülebilirlik}}\,--\,karmaşık arayüz, 2 hafta içinde uygulamayı bırakmaya yol açar.
+\end{itemize}
+\textbf{Myora'nın çözümü:} Manuel girişin yerini \emph{yakalama} alır\,--\,fotoğraf, ses veya belge yüklemesi\,--\,ve tüm sağlık sinyalleri tek bir kişiselleştirilmiş yapay zekâ katmanında birleşir.
 \end{posterblock}
 
 \begin{posterblock}{Temel Özellikler}
-\begin{itemize}
-  \item \textbf{AI Sağlık Profili:} BMI, BMR, TDEE, risk yorumu ve öneri üretimi.
-  \item \textbf{RAG Chatbot:} Bilimsel kaynak parçalarıyla desteklenen GPT-4o yanıtları.
-  \item \textbf{Çoklu Analiz:} Yemek fotoğrafı, kan tahlili, tıbbi fotoğraf ve sesli günlük.
-  \item \textbf{Giyilebilir Veri:} Adım, nabız, uyku, SpO2, stres ve HRV kayıtları.
-  \item \textbf{Ekosistem:} Takviye mağazası, aile ilaç takibi, topluluk ve bildirimler.
-\end{itemize}
+\centering\small
+\featcard{myoraOrange}{Y}{Yemek Yakalama}{GPT-4o Vision ile fotoğraftan kalori ve makro besin analizi.}
+\hfill
+\featcard{myoraPurple}{S}{Sesli Günlük}{NLP ile öğün, aktivite ve ruh hali sesli kaydı.}\\[0.25cm]
+\featcard{myoraGreen}{B}{Belge YZ}{Kan tahlili, reçete ve laboratuvar raporlarının OCR + YZ analizi.}
+\hfill
+\featcard{myoraBlue}{T}{Takviye Motoru}{RDA açıkları ve biyobelirteçlere göre kişisel plan.}\\[0.25cm]
+\featcard{myoraCyan}{A}{Analitik}{Haftalık trendler, makro dağılımı ve oruç geçmişi.}
+\hfill
+\featcard{myoraRed}{F}{Aile Takibi}{Aile bireyleri için ilaç ve uyum izlemi.}
 \end{posterblock}
 
-\begin{posterblock}{Teknoloji Yığını}
-\begin{tabularx}{\linewidth}{@{}lY@{}}
-\toprule
-\textbf{Katman} & \textbf{Teknolojiler} \\
-\midrule
-İstemci & React 18.3, TypeScript 5.8, Vite 5.4, SWC \\
-Arayüz & Tailwind CSS, shadcn/ui, Radix UI, Lucide React \\
-Durum & TanStack Query, React Context, typed query keys \\
-Mobil & Capacitor 7, Android WebView, Camera, Keyboard, Local Notifications \\
-Arka uç & Supabase Auth, PostgreSQL, Storage, Edge Functions \\
-AI & OpenAI GPT-4o, text-embedding-3-small, pgvector RAG \\
-Kalite & ESLint 9, strict TypeScript, lazy-loaded routes/charts \\
-\bottomrule
-\end{tabularx}
+\begin{posterblock}{Metodoloji}
+\small
+\begin{enumerate}\setlength{\itemsep}{0.2em}
+  \item \textbf{Veri Toplama Katmanı}\,--\,Capacitor eklentileri yerel kamera, mikrofon ve dosya seçici API'lerini tek bir çok platformlu arayüzde soyutlar.
+  \item \textbf{YZ Analiz Hattı}\,--\,Yakalanan her eser (görüntü / ses transkripsiyonu / PDF) yapılandırılmış sistem istemleriyle \texttt{OpenAI GPT-4o} API'sini çağıran bir Supabase \emph{Edge Function}'a (Deno) yönlendirilir ve tiplenmiş JSON döner.
+  \item \textbf{Kişiselleştirme Motoru}\,--\,TypeScript tabanlı RDA hesaplayıcı (NIH/WHO tabloları) yaş, cinsiyet, kilo, aktivite ve VKİ'ye göre mikro besin hedeflerini ayarlar; kan tahlili sonuçları bir biyobelirteç eşleme tablosu üzerinden ilgili RDA değerini çarpar.
+  \item \textbf{Durum Yönetimi}\,--\,TanStack React Query, API verilerini kademeli bayatlama süreleriyle önbelleğe alır (10\,sn gerçek zamanlı / 30\,sn dinamik / 5\,dk statik); iyimser güncellemeler yazma Supabase'e ulaşana kadar arayüzü duyarlı tutar.
+\end{enumerate}
 \end{posterblock}
 
-\begin{posterblock}{Proje Ölçeği}
+\begin{posterblock}{Sistem Mimarisi}
 \centering
-\metricbox{myoraBlue}{96}{React bileşen dosyası}
-\hfill
-\metricbox{myoraGreen}{32}{Drizzle/Supabase tablo modeli}
-\hfill
-\metricbox{myoraPurple}{14}{SQL migrasyon dosyası}
+\begin{tikzpicture}[
+  node distance=0.55cm,
+  every node/.style={font=\small},
+  arr/.style={-{Latex[length=3mm]}, line width=1pt, draw=myoraMuted}
+]
+  \tikzset{layerbase/.style={rounded corners=8pt, line width=1pt,
+    minimum width=10cm, minimum height=1.55cm, align=center, inner sep=5pt}}
+  \node[layerbase, draw=myoraBlue!60, fill=myoraBlue!10]
+    (ui)  {\textbf{İstemci (Android / iOS / Web)}\\React 18 + TS \textbullet\ Tailwind \textbullet\ shadcn/ui \textbullet\ Recharts};
+  \node[layerbase, draw=myoraCyan!60, fill=myoraCyan!10, below=of ui]
+    (cap) {\textbf{Capacitor 7 Köprüsü}\\Kamera \textbullet\ Mikrofon \textbullet\ Dosya \textbullet\ Haptics \textbullet\ Bildirim};
+  \node[layerbase, draw=myoraGreen!60, fill=myoraGreen!10, below=of cap]
+    (rq)  {\textbf{React Query Önbelleği}\\iyimser güncelleme \textbullet\ staleTime katmanları};
+  \node[layerbase, draw=myoraPurple!60, fill=myoraPurple!10, below=of rq]
+    (sb)  {\textbf{Supabase Bulutu}\\Auth \textbullet\ PostgreSQL (RLS) \textbullet\ Storage \textbullet\ Edge Functions};
+  \node[layerbase, draw=myoraOrange!60, fill=myoraOrange!10, below=of sb]
+    (ai)  {\textbf{Edge Functions (Deno)}\\\texttt{analyze-health-data} \textbullet\ \texttt{generate-chat-response} \textbullet\ \texttt{generate-health-profile}};
+  \node[layerbase, draw=myoraRed!60, fill=myoraRed!10, below=of ai]
+    (llm) {\textbf{OpenAI GPT-4o \& RAG}\\\texttt{gpt-4o} \textbullet\ \texttt{text-embedding-3-small} \textbullet\ pgvector};
 
-\vspace{0.8cm}
-\metricbox{myoraOrange}{3}{Supabase Edge Function}
-\hfill
-\metricbox{myoraCyan}{20+}{Kullanıcı modülü/rota}
-\hfill
-\metricbox{myoraRed}{53}{shadcn/ui dosyası}
+  \draw[arr] (ui)  -- (cap);
+  \draw[arr] (cap) -- (rq);
+  \draw[arr] (rq)  -- (sb);
+  \draw[arr] (sb)  -- (ai);
+  \draw[arr] (ai)  -- (llm);
+  \draw[arr, dashed, bend left=28, myoraPurple]
+    (llm.east) to node[right,text=myoraMuted,align=left,font=\scriptsize]
+      {tiplenmiş\\JSON} (ui.east);
+\end{tikzpicture}
+
+\vspace{0.1cm}
+\small Tüm tablolarda Satır Düzeyi Güvenlik (RLS) politikaları \texttt{user\_id}\,$\rightarrow$\,\texttt{profiles.id} zorunluluğuyla uygulanır.
 \end{posterblock}
 
 \end{column}
 
+% ============================================================
+% COLUMN 2
+% ============================================================
 \begin{column}{0.34\textwidth}
 
-\begin{posterblock}{Katmanlı Sistem Mimarisi}
+\begin{posterblock}{Yapay Zekâ Analiz Hattı}
 \centering
 \begin{tikzpicture}[
-  node distance=0.85cm,
-  arrow/.style={-{Latex[length=4mm]}, line width=1.1pt, draw=myoraMuted}
+  >={Latex[length=3mm]},
+  pbase/.style={
+    rounded corners=8pt, line width=1pt,
+    minimum width=3.4cm, minimum height=1.9cm, text width=3.2cm,
+    align=center, inner sep=4pt,
+    font=\footnotesize\bfseries
+  },
+  arr/.style={->, line width=1.1pt, draw=myoraMuted}
 ]
-  \layernode{myoraBlue}{24cm}{user}{\textsf{MOBİL + WEB}}{Kullanıcı Katmanı\\Android, iOS hedefi ve Web}
-  \layernode{myoraCyan}{24cm}{frontend}{\textsf{REACT SPA}}{React SPA Katmanı\\Pages, lazy components, hooks, contexts, shadcn/ui}
-  \layernode{myoraGreen}{24cm}{api}{\textsf{API}}{API ve Veri Erişimi\\Supabase JS SDK, modüler API barrel, React Query}
-  \layernode{myoraPurple}{24cm}{backend}{\textsf{SUPABASE}}{Supabase BaaS\\Auth, PostgreSQL, RLS, Storage, Edge Functions}
-  \layernode{myoraOrange}{24cm}{ai}{\textsf{AI + RAG}}{Yapay Zekâ Katmanı\\GPT-4o, vision analysis, RAG + pgvector}
+  % Row 1: 3 boxes left-to-right
+  \node[pbase, draw=myoraBlue!60,   fill=myoraBlue!12,   text=myoraBlue]                         (s1) {Yakalama\\{\tiny\color{myoraMuted}\mdseries resim / ses / PDF}};
+  \node[pbase, draw=myoraCyan!60,   fill=myoraCyan!12,   text=myoraCyan,   right=0.45cm of s1]   (s2) {base64\\{\tiny\color{myoraMuted}\mdseries istemci kodlama}};
+  \node[pbase, draw=myoraGreen!60,  fill=myoraGreen!12,  text=myoraGreen,  right=0.45cm of s2]   (s3) {Edge Fn\\{\tiny\color{myoraMuted}\mdseries Deno}};
+  % Row 2: 3 boxes right-to-left (below row 1)
+  \node[pbase, draw=myoraPurple!60, fill=myoraPurple!12, text=myoraPurple, below=1.0cm of s3]    (s4) {GPT-4o\\{\tiny\color{myoraMuted}\mdseries çok modlu}};
+  \node[pbase, draw=myoraOrange!60, fill=myoraOrange!12, text=myoraOrange, below=1.0cm of s2]    (s5) {Ayrıştırma\\{\tiny\color{myoraMuted}\mdseries tiplenmiş JSON}};
+  \node[pbase, draw=myoraRed!60,    fill=myoraRed!12,    text=myoraRed,    below=1.0cm of s1]    (s6) {Kaydet\\{\tiny\color{myoraMuted}\mdseries Supabase + RQ}};
 
-  \draw[arrow] (user) -- (frontend);
-  \draw[arrow] (frontend) -- (api);
-  \draw[arrow] (api) -- (backend);
-  \draw[arrow] (backend) -- (ai);
-  \draw[arrow, bend left=22, dashed, draw=myoraPurple] (ai.east) to node[right,align=left,text=myoraMuted,font=\small] {yanıt\\öneri\\analiz} (frontend.east);
+  \draw[arr] (s1) -- (s2);
+  \draw[arr] (s2) -- (s3);
+  \draw[arr] (s3) -- (s4);
+  \draw[arr] (s4) -- (s5);
+  \draw[arr] (s5) -- (s6);
 \end{tikzpicture}
 
 \vspace{0.3cm}
 \small
-Mimari, istemci tarafındaki etkileşimleri Supabase servisleri ve Deno Edge Functions üzerinden AI analiz katmanına bağlar. Web çıktısı \texttt{dist/public} klasörüne alınır ve Capacitor ile Android projesine senkronize edilir.
+Hat, istemci taraflı bir \textbf{yedek mekanizması} içerir: Edge Function 45 sn'yi aşarsa kural-tabanlı tahmini değerler yerel olarak üretilip kaydedilir, böylece kullanıcı deneyimi ağ gecikmesine takılı kalmaz.
 \end{posterblock}
 
-\begin{posterblock}{Kod Organizasyonu}
+\begin{posterblock}{Sağlık Skoru Modeli}
 \small
-\begin{tabularx}{\linewidth}{@{}lY@{}}
-\toprule
-\textbf{Dizin/Dosya} & \textbf{Sorumluluk} \\
-\midrule
-\texttt{client/src/App.tsx} & Provider zinciri, BrowserRouter/HashRouter seçimi, lazy-loaded route tanımları \\
-\texttt{client/src/pages/} & Uygulama kabukları: auth, onboarding, app layout, 404 \\
-\texttt{client/src/components/} & Sağlık panosu, analizler, chatbot, topluluk, aile, takviye, widget ve UI bileşenleri \\
-\texttt{client/src/contexts/} & Auth, dil ve sağlık verisi bağlamları \\
-\texttt{client/src/lib/api/} & Auth, health, chat, supplement, community, family, wearable ve notification API modülleri \\
-\texttt{shared/schema.ts} & Drizzle tipleriyle 32 tablo modeli \\
-\texttt{supabase/migrations/} & Supabase SQL şema evrimi, RLS ve RAG tabloları \\
-\texttt{supabase/functions/} & AI analiz, sağlık profili ve RAG chat Edge Functions \\
-\texttt{scripts/rag/} & Bilimsel kaynak seed ve URL ingest betikleri \\
-\texttt{android/} & Capacitor Android native proje çıktısı \\
-\bottomrule
-\end{tabularx}
+Skor bileşeni, $S \in [0,100]$ aralığında gerçek zamanlı bileşik bir skor üretir:
+\begin{equation*}
+  \boxed{\; S \;=\; 0{,}30\,N \;+\; 0{,}15\,H \;+\; 0{,}30\,A \;+\; 0{,}25\,C \;}
+\end{equation*}
+Her bileşen günün verisinden türetilir:
+
+\vspace{0.15cm}
+\begin{tikzpicture}[every node/.style={font=\small, text=myoraInk}]
+  \node[rounded corners=8pt, draw=myoraOrange!55, fill=myoraOrange!10, line width=1pt,
+        minimum width=8.0cm, minimum height=1.55cm, align=left, inner sep=7pt, text width=7.6cm]
+    (n1) {\textcolor{myoraOrange}{\bfseries N\ Beslenme (\%30)}\\
+          {\scriptsize kalori\_dengesi\,$\times$\,0{,}6 + protein\_\%\,$\times$\,0{,}4}};
+  \node[rounded corners=8pt, draw=myoraBlue!55, fill=myoraBlue!10, line width=1pt,
+        minimum width=8.0cm, minimum height=1.55cm, align=left, inner sep=7pt, text width=7.6cm,
+        right=0.35cm of n1]
+    (n2) {\textcolor{myoraBlue}{\bfseries H\ Hidrasyon (\%15)}\\
+          {\scriptsize su\_ml\,$\div$\,su\_hedefi\,$\times$\,100}};
+  \node[rounded corners=8pt, draw=myoraGreen!55, fill=myoraGreen!10, line width=1pt,
+        minimum width=8.0cm, minimum height=1.55cm, align=left, inner sep=7pt, text width=7.6cm,
+        below=0.3cm of n1]
+    (n3) {\textcolor{myoraGreen}{\bfseries A\ Aktivite (\%30)}\\
+          {\scriptsize $\min(\text{aktivite\_sayısı}\times 33,\ 100)$}};
+  \node[rounded corners=8pt, draw=myoraRed!55, fill=myoraRed!10, line width=1pt,
+        minimum width=8.0cm, minimum height=1.55cm, align=left, inner sep=7pt, text width=7.6cm,
+        below=0.3cm of n2]
+    (n4) {\textcolor{myoraRed}{\bfseries C\ Tutarlılık (\%25)}\\
+          {\scriptsize günlük\_kategori\,$\div$\,4\,$\times$\,100}};
+\end{tikzpicture}
+
+\vspace{0.2cm}
+\small Formül, \texttt{client/src/components/HealthDashboard.tsx} içinde birebir bu ağırlıklarla uygulanır; bileşen skorları \texttt{ScoreBreakdownModal} üzerinden kullanıcıya açıkça sunulur.
 \end{posterblock}
 
-\begin{posterblock}{Rota ve Kullanıcı Akışı}
+\begin{posterblock}{Kişiselleştirilmiş RDA Motoru}
+\small
+Takviye modülü, NIH/WHO Diyet Referans Alımlarını kullanarak 18 besin maddesindeki açıkları hesaplar. Aşağıda orta aktiviteli 30 yaşında bir erkek için örnek 7 günlük ortalama karşılanma gösterilmiştir; \textcolor{myoraGreen}{\bfseries yeşil kesikli çizgi} $=$ RDA hedefi.
+
+\vspace{0.2cm}
+\centering
+\rdabar{Çinko}{62}{myoraRed}\\[0.1cm]
+\rdabar{Protein}{88}{myoraOrange}\\[0.1cm]
+\rdabar{C Vit.}{74}{myoraYellow}\\[0.1cm]
+\rdabar{Ca}{58}{myoraRed}\\[0.1cm]
+\rdabar{B12 Vit.}{91}{myoraGreen}\\[0.1cm]
+\rdabar{Mg}{66}{myoraOrange}\\[0.1cm]
+\rdabar{D3 Vit.}{45}{myoraRed}\\[0.1cm]
+\rdabar{Omega-3}{52}{myoraRed}\\[0.1cm]
+\rdabar{Demir}{71}{myoraYellow}\\[0.1cm]
+\rdabar{Lif}{80}{myoraOrange}
+
+\vspace{0.2cm}
+\raggedright
+Her açık için doz, sıklık, günün en iyi zamanı, yiyecek eşleşmesi ve ilaç etkileşim uyarılarını içeren sıralı bir \textbf{TakviyePlanı} üretilir. Kan tahlili biyobelirteçleri temel RDA üzerinde çarpan görevi görür (ör. düşük ferritin\,$\Rightarrow$\,demir RDA\,$\times\,1{,}5$).
+\end{posterblock}
+
+\begin{posterblock}{Temel Veritabanı Varlıkları}
 \centering
 \begin{tikzpicture}[
-  node distance=0.45cm and 0.5cm,
-  flow/.style={rounded corners=8pt, draw=myoraLine, fill=white, align=center, text width=5.5cm, minimum height=1.2cm, font=\small},
-  arrow/.style={-{Latex[length=3mm]}, line width=0.9pt, draw=myoraMuted}
+  ent/.style={
+    rounded corners=6pt, draw=myoraBlue!55, fill=myoraBlue!8,
+    line width=0.9pt, minimum width=4.8cm, minimum height=1.3cm,
+    align=center, font=\small\ttfamily
+  },
+  elink/.style={-{Latex[length=2.5mm]}, draw=myoraMuted, line width=0.7pt}
 ]
-  \node[flow,draw=myoraBlue,fill=myoraBlue!8] (auth) {Auth\\giriş/kayıt};
-  \node[flow,right=of auth,draw=myoraGreen,fill=myoraGreen!8] (onb) {Onboarding\\profil verisi};
-  \node[flow,right=of onb,draw=myoraPurple,fill=myoraPurple!8] (home) {Dashboard\\sağlık skoru};
+  \node[ent] (p) {profiles};
+  \node[font=\tiny, below=0.05cm of p, text=myoraMuted] {kimlik \& onboarding};
 
-  \node[flow,below=of auth] (log) {Log\\yemek/ses/aktivite};
-  \node[flow,below=of onb] (coach) {Coach\\chat + boost};
-  \node[flow,below=of home] (analysis) {Analysis\\profil, wearable, kan};
+  \node[ent, below left=2.1cm and 2.4cm of p]   (f) {food\_entries};
+  \node[ent, below=2.1cm of p]                  (a) {activity\_entries};
+  \node[ent, below right=2.1cm and 2.4cm of p]  (d) {daily\_health\_logs};
 
-  \draw[arrow] (auth) -- (onb);
-  \draw[arrow] (onb) -- (home);
-  \draw[arrow] (home) -- (log);
-  \draw[arrow] (home) -- (coach);
-  \draw[arrow] (home) -- (analysis);
+  \node[ent, below=1.1cm of f] (v) {voice\_entries};
+  \node[ent, below=1.1cm of a] (b) {blood\_tests};
+  \node[ent, below=1.1cm of d] (h) {health\_documents};
+
+  \node[ent, below=1.1cm of v] (s) {supplement\_intake};
+  \node[ent, below=1.1cm of b] (m) {family\_members};
+  \node[ent, below=1.1cm of h] (u) {user\_streaks};
+
+  \foreach \child in {f,a,d}
+    \draw[elink] (p) -- (\child);
 \end{tikzpicture}
+
+\vspace{0.25cm}
+\small Toplam 32 tablo; hepsinde veritabanı katmanında uygulanan \textbf{Satır Düzeyi Güvenlik} (RLS) politikalarıyla \texttt{user\_id\,($\rightarrow$\,profiles.id)} alanı bulunur. Ek olarak RAG için \texttt{scientific\_sources} ve \texttt{scientific\_source\_chunks} (pgvector embedding) tabloları mevcuttur.
 \end{posterblock}
 
 \end{column}
 
+% ============================================================
+% COLUMN 3
+% ============================================================
 \begin{column}{0.32\textwidth}
 
-\begin{posterblock}{Veri Modeli ve Servisler}
-\textbf{Ana veri grupları:}
-\begin{itemize}
-  \item \textbf{Kimlik ve profil:} kullanıcı, onboarding, dil, zaman dilimi.
-  \item \textbf{Günlük sağlık:} kalori, protein, su, adım, uyku, stres, ruh hali.
-  \item \textbf{Analiz varlıkları:} yemek, aktivite, kan tahlili, belge, tıbbi fotoğraf, ses.
-  \item \textbf{Ekosistem:} takviye önerileri/siparişleri, topluluk gönderileri, aile ilaç kayıtları.
-  \item \textbf{RAG:} bilimsel kaynaklar, embedding chunk'ları, sohbet oturumları ve mesajlar.
-\end{itemize}
-
-\textbf{API yaklaşımı:} İstemci tarafında modüler API dosyaları tek bir barrel üzerinden dışa aktarılır. Bileşenler, Supabase istemcisi ve React Query aracılığıyla veri okuma/yazma yapar.
-\end{posterblock}
-
-\begin{posterblock}{AI ve RAG Akışı}
-\centering
-\begin{tikzpicture}[
-  node distance=0.38cm,
-  ragstep/.style={rounded corners=8pt, text width=8.6cm, align=center, minimum height=1.25cm, font=\small},
-  arrow/.style={-{Latex[length=3mm]}, line width=0.9pt, draw=myoraMuted}
-]
-  \node[ragstep,draw=myoraBlue,fill=myoraBlue!9] (q) {1. Kullanıcı sorusu veya sağlık verisi};
-  \node[ragstep,draw=myoraCyan,fill=myoraCyan!9, below=of q] (ctx) {2. Profil + günlük kayıt + analiz bağlamı};
-  \node[ragstep,draw=myoraGreen,fill=myoraGreen!9, below=of ctx] (ret) {3. pgvector ile bilimsel kaynak getirme};
-  \node[ragstep,draw=myoraPurple,fill=myoraPurple!9, below=of ret] (llm) {4. GPT-4o ile güvenli ve kaynaklı yanıt};
-  \node[ragstep,draw=myoraOrange,fill=myoraOrange!9, below=of llm] (ui) {5. Mobil arayüzde öneri, uyarı veya rapor};
-  \draw[arrow] (q) -- (ctx);
-  \draw[arrow] (ctx) -- (ret);
-  \draw[arrow] (ret) -- (llm);
-  \draw[arrow] (llm) -- (ui);
-\end{tikzpicture}
-
-\vspace{0.35cm}
+\begin{posterblock}{Sonuçlar ve Gelecek Çalışmalar}
 \small
-RAG katmanı, sağlık tavsiyelerinde kaynak izlenebilirliği ve halüsinasyon riskini azaltmayı hedefler. Kritik sağlık kararları için uygulama, kullanıcıyı profesyonel tıbbi görüşe yönlendirecek şekilde tasarlanır.
-\end{posterblock}
+\textbf{Gerçekleştirilenler:}
+\begin{itemize}\setlength{\itemsep}{0.15em}
+  \item[\textcolor{myoraGreen}{\checkmark}] Manuel girişin yerini alan \textbf{uçtan uca yapay zekâ gıda analizi} (GPT-4o vision).
+  \item[\textcolor{myoraGreen}{\checkmark}] Kan tahlili entegrasyonlu \textbf{kişiselleştirilmiş takviye motoru}.
+  \item[\textcolor{myoraGreen}{\checkmark}] Tek kod tabanından \textbf{çok platform} (Android + iOS hedefi + Web) desteği.
+  \item[\textcolor{myoraGreen}{\checkmark}] Capacitor Preferences + React Query önbelleğiyle \textbf{çevrimdışı öncelikli} mimari.
+  \item[\textcolor{myoraGreen}{\checkmark}] \texttt{pgvector} üzerinde kaynaklı atıf veren \textbf{RAG sohbet} katmanı.
+  \item[\textcolor{myoraGreen}{\checkmark}] Edge Function başarısız olduğunda kural-tabanlı \textbf{yedek yanıt} ile servis sürekliliği.
+\end{itemize}
 
-\begin{posterblock}{Mühendislik Kararları}
-\begin{itemize}
-  \item \textbf{Lazy loading:} tüm ana sayfa ve grafik bileşenleri dinamik yüklenerek ilk paket maliyeti azaltılır.
-  \item \textbf{BaaS mimarisi:} Supabase Auth, PostgreSQL, RLS ve Edge Functions ile ayrı Express sunucusu ihtiyacı düşürülür.
-  \item \textbf{Mobil uyumluluk:} Capacitor, aynı React kod tabanını Android WebView içinde native özelliklerle çalıştırır.
-  \item \textbf{Çok dilli yapı:} kullanıcıya görünen metinler TR/EN dil bağlamı üzerinden yönetilir.
-  \item \textbf{Tip güvenliği:} TypeScript, Zod doğrulama ve Drizzle şeması veri sözleşmelerini açık tutar.
+\textbf{Gelecek:}
+\begin{itemize}\setlength{\itemsep}{0.15em}
+  \item[\textcolor{myoraOrange}{$\rightarrow$}] Apple HealthKit ve Google Health Connect ile \textbf{canlı giyilebilir senkron} (Apple Watch, Galaxy Watch).
+  \item[\textcolor{myoraOrange}{$\rightarrow$}] Open Food Facts API üzerinden \textbf{ambalajlı gıda barkod tarayıcısı}.
+  \item[\textcolor{myoraOrange}{$\rightarrow$}] Sesli günlükler için \textbf{OpenAI Whisper} transkripsiyon entegrasyonu.
+  \item[\textcolor{myoraOrange}{$\rightarrow$}] Kişiselleştirilmiş kalori tahmini için \textbf{boylamsal makine öğrenmesi} modeli.
+  \item[\textcolor{myoraOrange}{$\rightarrow$}] Sürekli glukoz monitörü (CGM) entegrasyonu.
+  \item[\textcolor{myoraOrange}{$\rightarrow$}] GPT-4o-mini ile maliyet kademeleme ve klinik doğrulama çalışması.
 \end{itemize}
 \end{posterblock}
 
-\begin{posterblock}{Sonuç ve Katkı}
-Myora, sağlık verilerinin tek bir mobil uygulamada toplanması, yorumlanması ve kişiselleştirilmiş aksiyona dönüştürülmesi için uçtan uca bir yazılım mimarisi sunar. Proje; modern frontend geliştirme, BaaS tabanlı güvenli veri yönetimi, sunucusuz yapay zekâ fonksiyonları ve RAG destekli danışmanlık akışını tek akademik çalışma içinde birleştirir.
+\begin{posterblock}{Etkileşim ve Oyunlaştırma}
+\small
+Myora, günlük tutarlılığı artırmak için \emph{Duolingo tarzı} mekanikler içerir:
+\begin{itemize}\setlength{\itemsep}{0.1em}
+  \item \textcolor{myoraYellow}{\bfseries Başarımlar}\,--\,seriler, hedefler ve günlük giriş için rozetler.
+  \item \textcolor{myoraOrange}{\bfseries Seriler}\,--\,kurtarma bildirimleriyle günlük kontrol serisi.
+  \item \textcolor{myoraPurple}{\bfseries XP ve Seviyeler}\,--\,öğün, aktivite ve ses günlükleri XP kazandırır; 5 seviye.
+  \item \textcolor{myoraGreen}{\bfseries Günlük Görevler}\,--\,her gün sıfırlanan 5 görev; tam tamamlanma kutlanır.
+  \item \textcolor{myoraBlue}{\bfseries Mini Zorluklar}\,--\,hafta indeksine göre dönen 3 haftalık meydan okuma.
+\end{itemize}
+Tüm mekanikler \texttt{user\_streaks}, \texttt{achievements}, \texttt{user\_achievements} tabloları ve \texttt{challengeAPI} üzerinden kalıcılaştırılır.
+\end{posterblock}
 
-\vspace{0.2cm}
-\textbf{Gelecek çalışma alanları:} gerçek cihaz entegrasyonları, klinik doğrulama, bildirim optimizasyonu, offline-first veri senkronizasyonu ve daha geniş bilimsel kaynak havuzu.
+\begin{posterblock}{Etik ve Güvenlik}
+\small
+\begin{itemize}\setlength{\itemsep}{0.1em}
+  \item \textbf{RLS} her tabloda \texttt{user\_id} üzerinden aktif; ayrıcalık yükseltme engellenir.
+  \item Sistem bir \textbf{tıbbi tanı aracı değil}; klinik kararlar için profesyonel hekimliğe yönlendirir.
+  \item Tıbbi belge depoları Supabase Storage'da özel bucket'larda tutulur.
+  \item Edge Function'lar OpenAI hatalarında \textbf{bilgi sızdırmaz}, jenerik fallback döner.
+  \item Halüsinasyon riskini düşürmek için sohbet, \textbf{pgvector} üzerinden bilimsel kaynaklarla kısıtlı RAG bağlamı kullanır.
+\end{itemize}
+\end{posterblock}
+
+\begin{posterblock}{Teknik Özellikler}
+\small
+\begin{tabularx}{\linewidth}{@{}lY@{}}
+\toprule
+\textbf{Katman} & \textbf{Bileşen} \\
+\midrule
+UI         & React 18 \textbullet\ TypeScript 5.8 \textbullet\ Vite 5 \textbullet\ Tailwind CSS \textbullet\ shadcn/ui \textbullet\ Recharts \\
+Durum      & TanStack Query 5 \textbullet\ React Context \textbullet\ Zod \\
+Mobil      & Capacitor 7 \textbullet\ Camera \textbullet\ Mic \textbullet\ Local Notifications \textbullet\ Preferences \textbullet\ Haptics \\
+Arka uç    & Supabase Auth \textbullet\ PostgreSQL 15+ \textbullet\ RLS \textbullet\ Storage \textbullet\ Deno Edge Functions \\
+Yapay zekâ & OpenAI GPT-4o (vision + text) \textbullet\ text-embedding-3-small \textbullet\ pgvector RAG \\
+Kalite     & ESLint 9 \textbullet\ strict TS \textbullet\ lazy-loaded rotalar \textbullet\ ErrorBoundary \\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.3cm}
+\centering
+\tagpill{myoraBlue}{React 18}\ \tagpill{myoraCyan}{TypeScript}\ \tagpill{myoraGreen}{Vite 5}\ \tagpill{myoraOrange}{Tailwind}\\[0.12cm]
+\tagpill{myoraPurple}{Supabase}\ \tagpill{myoraRed}{PostgreSQL}\ \tagpill{myoraBlue}{Deno}\ \tagpill{myoraGreen}{RLS}\\[0.12cm]
+\tagpill{myoraOrange}{GPT-4o}\ \tagpill{myoraPurple}{Vision API}\ \tagpill{myoraCyan}{RAG}\ \tagpill{myoraGreen}{Zod}\\[0.12cm]
+\tagpill{myoraRed}{Capacitor}\ \tagpill{myoraBlue}{iOS/Android}\ \tagpill{myoraYellow}{React Query}\ \tagpill{myoraGreen}{pgvector}
 \end{posterblock}
 
 \begin{posterblock}{Derleme ve Kaynak}
 \small
-\begin{itemize}
-  \item Overleaf için ana dosya: \texttt{poster/myora\_academic\_poster.tex}
-  \item Önerilen derleyici: \textbf{pdfLaTeX}
-  \item Gerekli paketler: \texttt{beamerposter}, \texttt{tikz}, \texttt{fontawesome5}, \texttt{qrcode}
+\begin{itemize}\setlength{\itemsep}{0.1em}
+  \item \textbf{Ana dosya:} \texttt{poster/myora\_academic\_poster.tex}
+  \item \textbf{Derleyici:} pdfLaTeX veya Overleaf
+  \item \textbf{Gerekli paketler:} \texttt{beamerposter}, \texttt{tikz}, \texttt{babel} (Turkish), \texttt{xcolor}, \texttt{tabularx}, \texttt{amsmath}
 \end{itemize}
 
-\vspace{0.3cm}
-\begin{minipage}{\linewidth}
-  \RaggedRight
-  \textbf{Repo:}\\
-  \href{https://github.com/seyityorgun499-cyber/wellness-vision-coach}{github.com/seyityorgun499-cyber/wellness-vision-coach}\\[0.4cm]
-  \textbf{Ana başlık:}\\
-  Proje yapısı, teknoloji yığını, veri akışı ve AI mimarisi
-\end{minipage}
+\vspace{0.2cm}
+\textbf{Repo:} \href{https://github.com/seyityorgun499-cyber/wellness-vision-coach}{github.com/seyityorgun499-cyber/wellness-vision-coach}\\[0.15cm]
+\textbf{Veri kaynakları:} NIH / WHO Dietary Reference Intakes tabloları, RAG için PubMed ve akademik derleme bağlantıları (\texttt{scripts/rag/seed-sources.ts} içinde).
 \end{posterblock}
 
 \end{column}
@@ -328,7 +510,7 @@ Myora, sağlık verilerinin tek bir mobil uygulamada toplanması, yorumlanması 
 \vfill
 \begin{center}
 \small\color{myoraMuted}
-Bu poster, depodaki \texttt{README.md}, \texttt{docs/ARCHITECTURE.md}, \texttt{docs/RAG\_ARCHITECTURE.md}, \texttt{client/src/App.tsx}, \texttt{shared/schema.ts}, \texttt{supabase/} ve \texttt{capacitor.config.ts} içerikleri temel alınarak hazırlanmıştır.
+© 2026 Myora Health\ \ \textbullet\ \ React \& Capacitor istemci\ \ \textbullet\ \ Supabase + Deno Edge Functions\ \ \textbullet\ \ OpenAI GPT-4o\ \ \textbullet\ \ \texttt{github.com/seyityorgun499-cyber/wellness-vision-coach}
 \end{center}
 
 \end{frame}
