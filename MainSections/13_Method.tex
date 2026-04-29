@@ -4,13 +4,13 @@
 \section{YÖNTEM}
 \label{sec:yontem}
 
-Bu bölümde Myora platformunun sistem mimarisi, kullanılan teknolojiler, veritabanı tasarımı, yapay zekâ servisleri ve geliştirme süreci detaylı olarak açıklanmaktadır.
+Bu bölümde Myora platformunun sistem mimarisi, kullanılan teknolojiler, veritabanı tasarımı, Edge Function tabanlı yapay zekâ servisleri ve geliştirme süreci detaylı olarak açıklanmaktadır.
 
 \subsection{Sistem Mimarisi Genel Bakış}
 
-Myora, dört katmanlı bir monorepo mimarisi üzerine inşa edilmiştir. Şekil~\ref{fig:architecture}'de genel mimari yapı gösterilmektedir.
+Myora, dört katmanlı bir Backend-as-a-Service (BaaS) mimarisi üzerine inşa edilmiştir. Klasik bir Express sunucusu yerine \textbf{Supabase} platformu (auth, PostgreSQL, Edge Functions ve depolama) kullanılarak operasyonel yük en aza indirilmiş, geliştirme hızı artırılmıştır~\cite{Supabase2024}. Mimari katmanları şunlardır: (i)~Capacitor 7 tabanlı mobil sarmalayıcı katmanı, (ii)~React 18 SPA istemci katmanı, (iii)~Supabase Auth + PostgreSQL + Deno Edge Function arka uç katmanı ve (iv)~OpenAI GPT-4o destekli yapay zekâ analiz katmanı (Şekil~\ref{fig:architecture}).
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \fbox{\parbox{0.85\textwidth}{
 \centering
@@ -18,23 +18,26 @@ Myora, dört katmanlı bir monorepo mimarisi üzerine inşa edilmiştir. Şekil~
 \begin{tabular}{|p{0.8\textwidth}|}
 \hline
 \textbf{Mobil Katman} (Capacitor 7.x) \\
-iOS (Swift) $\mid$ Android (Kotlin) \\
+Android (Java) \mbox{$\mid$} iOS (gelecek hedef) \\
+Eklentiler: Camera, Haptics, Keyboard, LocalNotifications, Preferences \\
 \hline
-\textbf{İstemci Katmanı} (React 18.3 SPA) \\
-Pages $\rightarrow$ Components $\rightarrow$ Hooks $\rightarrow$ Context \\
-$\updownarrow$ REST API (lib/api.ts) \\
+\textbf{İstemci Katmanı} (React 18.3 SPA, Vite + SWC, TypeScript) \\
+Pages \mbox{$\rightarrow$} Lazy Components \mbox{$\rightarrow$} Hooks \mbox{$\rightarrow$} Contexts \\
+TanStack Query \mbox{$\mid$} Tailwind \mbox{$\mid$} shadcn/ui (Radix) \\
+$\updownarrow$ Supabase JS SDK (REST + Realtime) \\
 \hline
-\textbf{Sunucu Katmanı} (Express 5.x) \\
-Routes $\rightarrow$ Middleware $\rightarrow$ Services \\
-$\rightarrow$ AI Services (OpenAI GPT-4o) \\
-$\rightarrow$ RAG Pipeline \\
+\textbf{Arka Uç (Supabase BaaS)} \\
+Supabase Auth (e-posta/parola, JWT, RLS politikaları) \\
+PostgreSQL 15 + 33 tablo + pgvector eklentisi \\
+3 Deno Edge Function (analyze-health-data, generate-chat-response, generate-health-profile) \\
 \hline
-\textbf{Veritabanı Katmanı} \\
-PostgreSQL + Drizzle ORM (17+ tablo) \\
+\textbf{Yapay Zekâ Katmanı} \\
+OpenAI GPT-4o (chat/vision) \mbox{$\mid$} text-embedding-3-small (1536 boyut) \\
+RAG: pgvector + ivfflat indeksi + cosine benzerliği \\
 \hline
 \end{tabular}
 }}
-\caption{Myora platform mimarisi}
+\caption{Myora platformunun katmanlı sistem mimarisi}
 \label{fig:architecture}
 \end{figure}
 
@@ -42,9 +45,9 @@ PostgreSQL + Drizzle ORM (17+ tablo) \\
 
 \subsubsection{Ön Yüz (Frontend) Teknolojileri}
 
-Ön yüz katmanı, modern web standartlarına uygun olarak aşağıdaki teknolojiler ile geliştirilmiştir:
+Ön yüz katmanı, modern web standartlarına uygun olarak \texttt{package.json} dosyasında tanımlı bağımlılıklar kullanılarak geliştirilmiştir (Tablo~\ref{tab:frontend_stack}).
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption{Ön yüz teknoloji yığını}
 \label{tab:frontend_stack}
@@ -52,258 +55,306 @@ PostgreSQL + Drizzle ORM (17+ tablo) \\
 \hline
 \textbf{Teknoloji} & \textbf{Versiyon} & \textbf{Kullanım Amacı} \\
 \hline
-React             & 18.3    & Bileşen tabanlı UI çerçevesi \\
-Vite + SWC        & 5.4     & Hızlı HMR ile geliştirme aracı \\
-TypeScript        & 5.8     & Uçtan uca tip güvenliği \\
-Tailwind CSS      & 3.4     & Yardımcı sınıf tabanlı stilllendirme \\
-Radix UI / shadcn & --      & Erişilebilir, başsız UI bileşenleri \\
-TanStack Query    & 5.x     & Sunucu durumu önbellekleme \\
-React Router DOM  & 6.x     & İstemci tarafı yönlendirme \\
-Recharts          & 2.x     & Veri görselleştirme \\
-Lucide React      & 0.462   & SVG ikon kütüphanesi \\
-react-hook-form   & 7.x     & Form yönetimi \\
-Zod               & 3.x     & Şema doğrulama \\
+React              & 18.3 & Bileşen tabanlı UI çerçevesi~\cite{React2024} \\
+Vite + SWC plugin  & 5.4 / 4.x & Hızlı HMR ile geliştirme aracı \\
+TypeScript         & 5.8 & Strict mod tip güvenliği \\
+Tailwind CSS       & 3.4 & Yardımcı sınıf tabanlı stillendirme \\
+Radix UI / shadcn/ui & --   & Erişilebilir, başsız UI bileşenleri \\
+TanStack React Query & 5.x & Sunucu durum yönetimi ve önbellek \\
+React Router DOM    & 6.x & İstemci tarafı yönlendirme (BrowserRouter / HashRouter) \\
+Recharts            & 2.x & Veri görselleştirme (lazy yüklenir) \\
+Lucide React        & 0.462 & SVG ikon kütüphanesi \\
+react-hook-form     & 7.x & Form yönetimi \\
+Zod                 & 3.x & Şema doğrulama \\
+@supabase/supabase-js & 2.x & Auth/REST/Realtime istemcisi \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsubsection{Arka Yüz (Backend) Teknolojileri}
+\subsubsection{Arka Uç (Backend) Teknolojileri}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Arka yüz teknoloji yığını}
+\caption{Arka uç teknoloji yığını}
 \label{tab:backend_stack}
 \begin{tabular}{|l|l|l|}
 \hline
 \textbf{Teknoloji} & \textbf{Versiyon} & \textbf{Kullanım Amacı} \\
 \hline
-Express            & 5.x    & RESTful API sunucusu \\
-Node.js + TSX      & --     & TypeScript çalışma zamanı \\
-PostgreSQL         & --     & İlişkisel veritabanı \\
-Drizzle ORM        & 0.45   & Tip-güvenli SQL oluşturucu \\
-Drizzle Kit        & 0.31   & Şema push ve migrasyon \\
-express-session    & 1.18   & Oturum yönetimi \\
-connect-pg-simple  & 10.0   & PostgreSQL oturum deposu \\
-bcryptjs           & 3.x    & Parola hashleme (10 tur tuz) \\
-OpenAI SDK         & 6.16   & GPT-4o API entegrasyonu \\
-esbuild            & 0.27   & Üretim sunucu paketleme \\
+Supabase Platform   & --    & BaaS (auth, DB, edge fn, storage)~\cite{Supabase2024} \\
+PostgreSQL          & 15+   & İlişkisel veritabanı~\cite{PostgreSQL2024} \\
+pgvector eklentisi  & --    & Vektör benzerlik araması (1536 boyut) \\
+Deno (Edge Runtime) & v1.x  & Sunucusuz fonksiyon çalışma zamanı \\
+Supabase Auth       & --    & E-posta/parola, JWT, RLS \\
+Row Level Security  & --    & Kullanıcı bazlı veri izolasyonu \\
+OpenAI Node SDK     & 6.x   & GPT-4o ve embedding API erişimi \\
+Drizzle Kit         & 0.31  & Sadece şema tipleri (\texttt{db:push}) \\
 \hline
 \end{tabular}
 \end{table}
 
+\subsubsection{Mobil Katman}
+
+Capacitor 7 ile aynı kod tabanından native Android (\texttt{com.myora.app}) paketi üretilmektedir~\cite{Capacitor2024}. Web çıktısı (\texttt{dist/public}) \texttt{npx cap sync android} komutu ile Android Studio projesine kopyalanmaktadır. \texttt{capacitor.config.ts} dosyasındaki temel eklentiler: \texttt{@capacitor/camera} (yemek ve tıbbi fotoğraf), \texttt{@capacitor/haptics} (dokunmatik geri bildirim), \texttt{@capacitor/keyboard} (klavye davranışı), \texttt{@capacitor/local-notifications} (bildirim zamanlama) ve \texttt{@capacitor/preferences} (anahtar-değer depolama).
+
 \subsection{Dizin Yapısı ve Kod Organizasyonu}
 
-Proje, monorepo yapısında organize edilmiş olup paylaşılan şema (\texttt{shared/schema.ts}) hem istemci hem de sunucu tarafından TypeScript yol takma adları (\texttt{@shared/*}) ile erişilebilmektedir.
+Proje, paylaşılan tip tanımları (\texttt{shared/schema.ts}) ile istemci ve Edge Function'lar arasında köprü kuran bir monorepo olarak organize edilmiştir.
 
-\begin{verbatim}
-wellness-vision-coach/
-├── client/
-│   └── src/
-│       ├── components/    (30+ UI bileşeni)
-│       ├── contexts/      (Auth, HealthData, Language)
-│       ├── hooks/         (useHealthData, useMobile, useToast)
-│       ├── lib/           (api.ts, utils.ts)
-│       ├── pages/         (Auth, Index, NotFound)
-│       └── services/      (Notification, NativeWidget)
-├── server/
-│   ├── routes/            (auth, health, chat, supplement, ...)
-│   ├── services/          (ai, rag, healthTracking, ...)
-│   └── middleware/        (auth)
-├── shared/
-│   └── schema.ts          (Drizzle ORM şeması)
-└── capacitor.config.ts    (Mobil yapılandırma)
-\end{verbatim}
+\begin{table}[H]
+\centering
+\caption{Proje dizin yapısı (üst seviye)}
+\label{tab:dir_structure}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Dizin / Dosya} & \textbf{İçerik} \\
+\hline
+\texttt{client/src/components/}    & 41 üst-düzey React bileşeni \\
+\texttt{client/src/components/ui/} & 53 shadcn/ui temel bileşeni \\
+\texttt{client/src/components/charts/} & Recharts sarmalayıcıları (lazy) \\
+\texttt{client/src/contexts/}      & 3 React Context (Auth, HealthData, Language) \\
+\texttt{client/src/hooks/}         & 7 özel kanca (useHealthScore, useStreak, vb.) \\
+\texttt{client/src/lib/api/}       & 8 modüler API katmanı (auth, health, chat, ...) \\
+\texttt{client/src/pages/}         & AppLayout, Auth, Onboarding, Index, NotFound \\
+\texttt{client/src/services/}      & Bildirim ve native widget servisleri \\
+\texttt{supabase/migrations/}      & 14 SQL migrasyon dosyası (1219 satır) \\
+\texttt{supabase/functions/}       & 3 Edge Function dizini \\
+\texttt{shared/schema.ts}          & Drizzle tip şeması (yalnızca tip referansı) \\
+\texttt{scripts/rag/}              & Bilimsel kaynak yutma (ingest) betikleri \\
+\texttt{android/}                  & Capacitor Android projesi \\
+\hline
+\end{tabular}
+\end{table}
 
 \subsection{Veritabanı Tasarımı}
 
-Veritabanı şeması, Drizzle ORM kullanılarak \texttt{shared/schema.ts} dosyasında tanımlanmıştır. Tüm tablolar UUID birincil anahtar kullanmaktadır (kullanıcılar tablosu hariç -- otomatik artan serial). Şekil~\ref{fig:er} varlık-ilişki diyagramını göstermektedir.
+Veritabanı şeması, \texttt{supabase/migrations/} dizinindeki 14 ayrı SQL migrasyon dosyasında tanımlanmıştır ve toplamda 33 tablo ile bunların ilişkilerini, indekslerini ve Row Level Security (RLS) politikalarını içermektedir. Tüm tablolar UUID birincil anahtar (\texttt{gen\_random\_uuid()}) kullanmakta ve \texttt{auth.users} tablosuna \texttt{ON DELETE CASCADE} ilişkisi ile bağlanmaktadır.
 
-\begin{figure}[htbp]
+Tablo~\ref{tab:db_modules} migrasyon modülleri ve kapsadıkları tabloları özetlemektedir.
+
+\begin{table}[H]
 \centering
-\fbox{\parbox{0.9\textwidth}{
-\footnotesize
-\begin{verbatim}
-users (PK: id)
- ├──< user_devices >── wearable_devices
- ├──< wearable_data >── wearable_devices
- ├──< daily_health_logs
- ├──< food_entries
- ├──< activity_entries
- ├──< blood_tests ──< blood_test_results
- ├──< health_documents
- ├──< medical_photos
- ├──< voice_entries
- ├──< health_profiles (1:1)
- ├──< chat_conversations ──< chat_messages
- ├──< supplement_recommendations >── supplements
- ├──< supplement_orders >── supplements
- ├──< fasting_logs
- ├──< community_posts ──< community_comments
- │                     ──< community_likes
- ├──< family_members ──< family_medications
- │                   ──< family_medication_logs
- ├──< notifications
- ├──< notification_preferences (1:1)
- ├──< user_goals
- └──< user_achievements >── achievements
-\end{verbatim}
-}}
-\caption{Myora veritabanı varlık-ilişki diyagramı}
-\label{fig:er}
-\end{figure}
+\caption{Migrasyon modülleri ve içerdikleri tablolar}
+\label{tab:db_modules}
+\small
+\begin{tabular}{|l|p{0.55\textwidth}|c|}
+\hline
+\textbf{Migrasyon} & \textbf{Tablolar} & \textbf{Sayı} \\
+\hline
+\texttt{profiles}              & profiles                                                           & 1 \\
+\texttt{core\_health}          & daily\_health\_logs, food\_entries, activity\_entries, voice\_entries, health\_documents & 5 \\
+\texttt{streak\_achievements}  & achievements, user\_achievements, user\_streaks                    & 3 \\
+\texttt{goals\_community}      & user\_goals, community\_posts, community\_comments, community\_likes & 4 \\
+\texttt{family\_supplements}   & family\_members, family\_medications, family\_medication\_logs, supplements, supplement\_recommendations, supplement\_orders & 6 \\
+\texttt{health\_profiles}      & health\_profiles                                                   & 1 \\
+\texttt{chat}                  & chat\_conversations, chat\_messages                                & 2 \\
+\texttt{analysis\_assets}      & blood\_tests, blood\_test\_results, medical\_photos                & 3 \\
+\texttt{wearables}             & wearable\_devices, user\_devices, wearable\_data                   & 3 \\
+\texttt{fasting}               & fasting\_logs                                                      & 1 \\
+\texttt{rag\_chunks}           & scientific\_sources, scientific\_source\_chunks, rag\_query\_logs  & 3 \\
+\texttt{supplement\_tracking}  & supplement\_intake\_logs                                           & 1 \\
+\hline
+\textbf{Toplam}                &                                                                    & \textbf{33} \\
+\hline
+\end{tabular}
+\end{table}
 
 \subsubsection{Temel Tablolar ve Alanları}
 
-\paragraph{Kullanıcılar Tablosu (\texttt{users}):}
-Kullanıcı kimlik bilgileri, fiziksel ölçüler ve tercihler bu tabloda tutulmaktadır. Temel alanlar: \texttt{id} (serial PK), \texttt{email} (benzersiz), \texttt{password} (bcrypt hash), \texttt{displayName}, \texttt{heightCm}, \texttt{weightKg} (decimal), \texttt{gender}, \texttt{language} (tr/en), \texttt{activityLevel}, \texttt{timezone}, \texttt{onboardingCompleted}.
+\paragraph{Kullanıcı Profilleri (\texttt{profiles}):}
+\texttt{auth.users} tablosuyla 1:1 ilişkili olup PRIMARY KEY \texttt{id uuid} alanı \texttt{auth.users(id)}'e referans vermektedir. Yeni bir kullanıcı kayıt olduğunda \texttt{handle\_new\_user\_profile} adlı tetikleyici (trigger) ile otomatik oluşturulur. Alanlar: \texttt{email}, \texttt{display\_name}, \texttt{date\_of\_birth}, \texttt{gender}, \texttt{height\_cm}, \texttt{weight\_kg numeric(5,2)}, \texttt{activity\_level} (varsayılan \texttt{moderate}), \texttt{language} (\texttt{tr}/\texttt{en}), \texttt{timezone} (\texttt{Europe/Istanbul}), \texttt{onboarding\_completed}.
 
 \paragraph{Günlük Sağlık Kayıtları (\texttt{daily\_health\_logs}):}
-Her kullanıcının günlük sağlık özeti: \texttt{caloriesConsumed}, \texttt{caloriesBurned}, \texttt{caloriesTarget}, \texttt{proteinGrams}, \texttt{waterMl}, \texttt{steps}, \texttt{sleepMinutes}, \texttt{stressLevel} (1--10), \texttt{moodScore} (1--5). \texttt{(userId, date)} çiftinde dizin (index) bulunmaktadır.
+\texttt{(user\_id, date)} bileşik benzersizlik kısıtlamasıyla günlük özet veri tutar: \texttt{calories\_consumed}, \texttt{calories\_burned}, \texttt{calories\_target} (varsayılan 2100), \texttt{protein\_grams}, \texttt{protein\_target} (180g), \texttt{carbs\_grams}, \texttt{fat\_grams}, \texttt{water\_ml}, \texttt{water\_target} (2400 mL), \texttt{steps}, \texttt{steps\_target} (10\,000), \texttt{sleep\_minutes}, \texttt{sleep\_target} (480 dk), \texttt{stress\_level}, \texttt{mood\_score}.
 
 \paragraph{Besin Girişleri (\texttt{food\_entries}):}
-\texttt{mealType} (kahvaltı/öğle/akşam/atıştırma), \texttt{foodName}, \texttt{calories}, makro besin değerleri, \texttt{source} (manuel/kamera/barkod/ses) ve \texttt{aiConfidence} alanlarını içermektedir.
+\texttt{meal\_type}, \texttt{food\_name}, \texttt{calories}, makro besinler (\texttt{protein\_grams}, \texttt{carbs\_grams}, \texttt{fat\_grams}, \texttt{fiber\_grams}), \texttt{serving\_size}, \texttt{image\_url}, \texttt{barcode}, \texttt{ai\_confidence numeric(5,2)} ve \texttt{source} (\texttt{manual} / \texttt{camera} / \texttt{voice} / \texttt{barcode}).
 
-\paragraph{Kan Tahlilleri (\texttt{blood\_tests} ve \texttt{blood\_test\_results}):}
-Kan tahlili meta verileri (tarih, laboratuvar, OCR metni, AI özeti, genel durum) ve her bir belirteç sonucu (belirteç adı, değer, birim, referans aralığı, durum, kategori, AI yorumu) ayrı tablolarda tutulmaktadır. Durum alanı \texttt{normal}, \texttt{low}, \texttt{high} veya \texttt{critical} değerlerini alabilmektedir.
+\paragraph{Kan Tahlilleri (\texttt{blood\_tests} / \texttt{blood\_test\_results}):}
+Üst tablo OCR metni, AI özeti ve genel durum bilgilerini; alt tablo her bir belirteci (marker adı, değer, birim, referans aralığı, durum: \texttt{normal}/\texttt{low}/\texttt{high}/\texttt{critical}, kategori, AI yorumu) tutar.
 
 \paragraph{Sağlık Profili (\texttt{health\_profiles}):}
-Her kullanıcı için benzersiz (1:1) AI tarafından üretilen sağlık profili: \texttt{bmi}, \texttt{bmr}, \texttt{tdee}, \texttt{bodyFatEstimate}, \texttt{healthScore} (0--100), \texttt{riskFactors} (JSONB), \texttt{nutritionPlan} (JSONB), \texttt{exercisePlan} (JSONB), \texttt{supplementRecommendations} (JSONB), \texttt{aiGeneratedSummary}.
+Kullanıcı başına 1:1 olup AI tarafından üretilen kapsamlı analizi tutar: \texttt{bmi}, \texttt{bmr}, \texttt{tdee}, \texttt{body\_fat\_estimate}, \texttt{health\_score} (0--100), \texttt{risk\_factors} (JSONB), \texttt{strengths} (text[]), \texttt{improvement\_areas} (text[]), \texttt{nutrition\_plan} (JSONB), \texttt{exercise\_plan} (JSONB), \texttt{supplement\_recommendations} (JSONB), \texttt{ai\_generated\_summary}.
 
-\paragraph{RAG Altyapısı (\texttt{scientific\_sources}, \texttt{chat\_conversations}, \texttt{chat\_messages}):}
-Bilimsel kaynaklar tablosu: başlık, yazarlar, dergi, DOI, özet, tam metin, kategori ve gömme vektörü. Sohbet mesajları tablosunda \texttt{citations} (JSONB) alanı ile kaynak atıfları saklanmaktadır.
+\paragraph{RAG Altyapısı:}
+\texttt{scientific\_sources} (başlık, yazarlar, dergi, DOI, kategori, doğrulanmış mı), \texttt{scientific\_source\_chunks} (parça metni, \texttt{embedding extensions.vector(1536)}, anahtar kelimeler, dil) ve \texttt{rag\_query\_logs} (her sorgu için getirilen parça kimlikleri, benzerlik skorları, model, gecikme) tablolarından oluşmaktadır. \texttt{idx\_chunks\_embedding} indeksi \texttt{ivfflat} ve \texttt{vector\_cosine\_ops} ile 50 küme üzerinde tanımlıdır. \texttt{public.match\_source\_chunks(query\_embedding, match\_threshold, match\_count, ...)} adlı PostgreSQL fonksiyonu Edge Function'lar tarafından RPC ile çağrılarak benzerlik araması yapar.
 
-\subsection{API Tasarımı}
+\paragraph{Sohbet (\texttt{chat\_conversations} / \texttt{chat\_messages}):}
+Mesaj tablosunda \texttt{role} (\texttt{user}/\texttt{assistant}), \texttt{content}, \texttt{citations} (JSONB), \texttt{suggested\_follow\_ups} (text[]) ve \texttt{topic} alanları bulunmaktadır.
 
-Sunucu tarafı, 6 rota modülü halinde organize edilmiş olup toplam 80'den fazla RESTful API uç noktası sunmaktadır. Tablo~\ref{tab:api_summary}'de API modülleri özetlenmektedir.
+\paragraph{Row Level Security:}
+Tüm hassas tablolar (\texttt{profiles}, \texttt{daily\_health\_logs}, \texttt{food\_entries}, \texttt{blood\_tests}, \texttt{health\_profiles}, vb.) için \texttt{enable row level security} ile RLS aktifleştirilmiş ve \texttt{(select auth.uid()) = user\_id} koşulu ile yalnızca veri sahibinin SELECT/INSERT/UPDATE/DELETE yapabileceği politikalar tanımlanmıştır. Bilimsel kaynaklar paylaşımlı bilgi tabanı olduğundan tüm kimlik doğrulanmış kullanıcılar tarafından okunabilir; yutma (ingestion) işlemleri \texttt{service\_role} ile yapılır.
 
-\begin{table}[htbp]
+\subsection{İstemci API Katmanı}
+
+İstemci tarafı API katmanı \texttt{client/src/lib/api/} altında 8 ayrı modül halinde organize edilmiştir; toplam 2954 satır TypeScript koddan oluşmaktadır. Her modül namespaced bir nesne olarak dışa aktarılmaktadır (Tablo~\ref{tab:api_modules}).
+
+\begin{table}[H]
 \centering
-\caption{API modülleri ve uç nokta sayıları}
-\label{tab:api_summary}
-\begin{tabular}{|l|l|c|}
+\caption{İstemci API modülleri ve sorumlulukları}
+\label{tab:api_modules}
+\begin{tabular}{|l|c|p{0.45\textwidth}|}
 \hline
-\textbf{Modül} & \textbf{Temel Yol} & \textbf{Uç Nokta} \\
+\textbf{Modül} & \textbf{Satır} & \textbf{Sorumluluk} \\
 \hline
-Kimlik Doğrulama & \texttt{/api/auth/*}        & 5 \\
-Sağlık Takibi    & \texttt{/api/health/*}      & 25 \\
-Sohbet (RAG)     & \texttt{/api/chat/*}        & 6 \\
-Takviye Gıda     & \texttt{/api/supplements/*} & 6 \\
-Topluluk         & \texttt{/api/community/*}   & 7 \\
-Aile Takibi      & \texttt{/api/family/*}      & 11 \\
-Giyilebilir Cihaz& \texttt{/api/wearables/*}   & 6 \\
+\texttt{auth.ts}        & 97   & Kayıt, giriş, çıkış, profil güncelleme \\
+\texttt{health.ts}      & 978  & Günlük log, besin, aktivite, kan, belge, fotoğraf, ses, oruç, hedef, başarım \\
+\texttt{chat.ts}        & 258  & Konuşma listesi, mesaj gönderme, RAG yanıtı, sağlık profili oluşturma \\
+\texttt{supplement.ts}  & 224  & Katalog, AI önerileri, sipariş ve alım kayıtları \\
+\texttt{community.ts}   & 158  & Gönderi/yorum/beğeni \\
+\texttt{family.ts}      & 251  & Aile üyeleri, ilaç ve kayıtları, uyum oranları \\
+\texttt{wearable.ts}    & 129  & Cihaz katalogu, eşleme, veri senkronizasyonu \\
+\texttt{notification.ts}& 52   & Tercih yönetimi ve haftalık görevler \\
+\texttt{\_common.ts}    & 117  & Supabase istemci, oturum yardımcıları, hata sarmalayıcıları \\
+\texttt{types.ts}       & 657  & Paylaşılan tip tanımları \\
 \hline
-\textbf{Toplam}  &                             & \textbf{66+} \\
+\textbf{Toplam}         & \textbf{2921} & \\
 \hline
 \end{tabular}
 \end{table}
 
 \subsubsection{Kimlik Doğrulama ve Oturum Yönetimi}
 
-Kimlik doğrulama, PostgreSQL destekli oturum tabanlı bir mekanizma ile gerçekleştirilmektedir. Kullanıcı şifreleri \texttt{bcryptjs} kütüphanesi ile 10 tur tuz (salt round) kullanılarak hashlenmektedir. Oturum çerezi \texttt{httpOnly} olarak işaretlenmiş olup 30 gün TTL (yaşam süresi) ile yapılandırılmıştır.
+Kimlik doğrulama, Supabase Auth tarafından sağlanmaktadır. Akış şu şekildedir:
 
-Kimlik doğrulama akışı:
 \begin{enumerate}
-    \item Kullanıcı \texttt{POST /api/auth/register} ile kayıt olur (Zod şema doğrulaması),
-    \item Şifre bcrypt ile hashlenerek veritabanına kaydedilir,
-    \item \texttt{POST /api/auth/login} ile giriş yapılır, oturum oluşturulur,
-    \item Korunan rotalar \texttt{requireAuth} middleware'i ile oturum kontrolü yapar,
-    \item \texttt{GET /api/auth/me} ile mevcut oturum doğrulanır.
+    \item Kullanıcı \texttt{authAPI.signUp(email, password, displayName)} çağrısı ile kayıt olur. Bu çağrı Supabase \texttt{auth.signUp} metodunu kullanır.
+    \item \texttt{auth.users} tablosuna kayıt yapıldığında \texttt{handle\_new\_user\_profile} tetikleyicisi \texttt{public.profiles} tablosuna ilgili satırı oluşturur.
+    \item Giriş için \texttt{authAPI.signIn} kullanılır; başarılı oturumla birlikte JWT erişim simgesi (access token) üretilir ve istemci tarafında \texttt{onAuthStateChange} dinleyicisi ile takip edilir.
+    \item Tüm sonraki API çağrıları, Supabase JS SDK üzerinden \texttt{Authorization: Bearer <jwt>} başlığı ile yapılır; veriye erişim RLS politikaları ile sınırlandırılır.
+    \item \texttt{ProtectedRoute} bileşeni \texttt{AuthContext}'i tüketerek korumalı rotaları yetkisiz kullanıcılardan yönlendirir.
 \end{enumerate}
 
-\subsection{Yapay Zekâ Servisleri}
+\subsection{Yapay Zekâ Servisleri (Supabase Edge Functions)}
 
-Myora'nın yapay zekâ katmanı, OpenAI GPT-4o modeline dayanan 6 ayrı analiz servisi içermektedir. Tüm servisler yapılandırılmış JSON çıktı formatı (\texttt{response\_format: \{type: "json\_object"\}}) kullanmakta ve Türkçe yanıt vermek üzere yapılandırılmıştır.
+Myora'nın yapay zekâ katmanı, Deno çalışma zamanında çalışan üç ayrı Supabase Edge Function ile gerçekleştirilmiştir (Tablo~\ref{tab:ai_services}). Tüm fonksiyonlar OpenAI GPT-4o modelini kullanmakta, yapılandırılmış JSON çıktı formatı (\texttt{response\_format: \{type: "json\_object"\}}) ile yanıt vermekte ve ALLOWED\_ORIGINS yapılandırması ile CORS güvenliği sağlamaktadır.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\caption{Yapay zekâ analiz servisleri}
+\caption{Edge Function tabanlı yapay zekâ servisleri}
 \label{tab:ai_services}
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|c|p{0.45\textwidth}|}
 \hline
-\textbf{Servis} & \textbf{Girdi} & \textbf{Çıktı} \\
+\textbf{Edge Function} & \textbf{Satır} & \textbf{Görev} \\
 \hline
-\texttt{analyzeFoodImage}    & Base64 fotoğraf       & Besin adı, kalori, makrolar \\
-\texttt{analyzeBloodTest}    & OCR metni             & Belirteçler, durum, öneriler \\
-\texttt{analyzeHealthDoc}    & Belge metni           & Özet, bulgular, etiketler \\
-\texttt{analyzeMedicalPhoto} & Base64 fotoğraf       & Gözlemler, endişeler, aciliyet \\
-\texttt{analyzeVoiceEntry}   & Transkripsiyon        & Duygu, ruh hali, öneriler \\
-\texttt{generateHealthProfile}& Tüm sağlık verileri  & BMI, BMR, TDEE, planlar, skor \\
+\texttt{analyze-health-data}     & 203 & 6 alt-tip için tek uç nokta: \texttt{food-image}, \texttt{blood-test}, \texttt{document}, \texttt{medical-photo}, \texttt{voice-entry}, \texttt{voice-food} \\
+\texttt{generate-chat-response}  & 285 + 843 (lib) & 8 aşamalı RAG pipeline (Auth $\to$ Safety $\to$ Topic $\to$ Context $\to$ Retrieval $\to$ Prompt $\to$ Generation $\to$ Logging) \\
+\texttt{generate-health-profile} & 259 & BMI, BMR (Mifflin--St Jeor), TDEE, sağlık skoru ve plan üretimi \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsubsection{RAG Chatbot Pipeline}
+\subsubsection{analyze-health-data: Çok Kipli Analiz}
 
-RAG chatbot, kullanıcının sağlık sorusunu bilimsel kaynaklarla destekleyerek yanıtlayan bir boru hattı (pipeline) mimarisine sahiptir. Şekil~\ref{fig:rag}'te RAG akışı gösterilmektedir.
+\texttt{type} alanına göre dinamik bir prompt seçilerek GPT-4o'ya çağrı yapılır; OpenAI anahtarı yoksa veya çağrı başarısızsa servis, alanın varsayılan/yedek (fallback) bir JSON nesnesi döndürür. Örnek alt-tipler:
+\begin{itemize}
+    \item \texttt{food-image} -- base64 görüntü ile besin adı, kalori, porsiyon, makrolar (protein/carbs/fat/fiber, gram + yüzde) ve sağlık notları üretir.
+    \item \texttt{medical-photo} -- 5 fotoğraf tipi (\texttt{urine}, \texttt{stool}, \texttt{tongue}, \texttt{eye}, \texttt{skin}) için renk, gözlem, endişe ve aciliyet (\texttt{low}/\texttt{medium}/\texttt{high}/\texttt{urgent}) üretir.
+    \item \texttt{blood-test} -- OCR metninden belirteçleri çıkararak kategori, durum ve öneri listesi sunar.
+    \item \texttt{voice-entry} / \texttt{voice-food} -- transkripsiyondan duygu, ruh hali, anahtar kelimeler veya yenen yiyecekleri çıkarır.
+\end{itemize}
 
-\begin{figure}[htbp]
+\subsubsection{generate-chat-response: 8 Aşamalı RAG Pipeline}
+
+RAG chatbot, Şekil~\ref{fig:rag}'te gösterilen sekiz aşamalı bir boru hattıyla çalışmaktadır~\cite{Lewis2020RAG}. Aşamalar \texttt{supabase/functions/generate-chat-response/lib/} altındaki beş modül (\texttt{safety.ts}, \texttt{topic.ts}, \texttt{context.ts}, \texttt{retrieval.ts}, \texttt{prompt.ts}) tarafından gerçekleştirilmektedir.
+
+\begin{figure}[H]
 \centering
 \fbox{\parbox{0.85\textwidth}{
 \centering
-\textbf{RAG Chatbot Veri Akışı}\\[8pt]
-Kullanıcı Sorgusu\\
-$\downarrow$\\
-Anahtar Kelime Çıkarma (TR/EN durak kelime filtreleme, maks. 8)\\
-$\downarrow$\\
-Bilimsel Kaynak Erişimi (\texttt{scientific\_sources} tablosunda ILIKE arama)\\
-$\downarrow$\\
-Kullanıcı Bağlamı Oluşturma (Paralel: sağlık profili + kan tahlili + kaynaklar)\\
-$\downarrow$\\
-Sistem İstemi Oluşturma (Rol + 5 kural + kaynaklar + profil)\\
-$\downarrow$\\
-GPT-4o JSON Yanıtı\\
-$\downarrow$\\
-\{content (Markdown), citations[], suggestedFollowUps[]\}
+\textbf{RAG Chatbot Veri Akışı (8 Aşama)}\\[8pt]
+1. Kullanıcı sorgusu + auth (JWT doğrulama) \\
+$\downarrow$ \\
+2. \textbf{Safety} -- 7 yüksek riskli intent örüntüsü (göğüs ağrısı, intihar, anafilaksi, vb.) \\
+$\downarrow$ \\
+3. \textbf{Topic} -- konu sınıflandırması (\texttt{nutrition}, \texttt{sleep}, \texttt{exercise}, ...) \\
+$\downarrow$ \\
+4. \textbf{Context} -- profil, kan, oruç, su, son besinler (paralel sorgular) \\
+\quad $\parallel$ \quad \\
+5. \textbf{Retrieval} -- 1536 boyutlu embedding + \texttt{match\_source\_chunks} RPC (\texttt{matchThreshold=0.3}, \texttt{matchCount=8}) \\
+$\downarrow$ \\
+6. \textbf{Prompt} -- rol + kurallar + bilimsel kaynaklar + kullanıcı bağlamı \\
+$\downarrow$ \\
+7. \textbf{Generation} -- GPT-4o JSON yanıtı: \{content, citations[], suggestedFollowUps[]\} \\
+$\downarrow$ \\
+8. \textbf{Logging} -- \texttt{rag\_query\_logs}'a sorgu, parça kimlikleri, benzerlik skorları ve gecikme yazılır \\
 }}
-\caption{RAG chatbot boru hattı akış diyagramı}
+\caption{Myora RAG chatbot 8-aşamalı boru hattı}
 \label{fig:rag}
 \end{figure}
 
+\paragraph{Güvenlik Katmanı (Safety):}
+\texttt{lib/safety.ts}, kardiyak acil, solunum acili, bilinç kaybı, intihar düşüncesi, hemoraji, anafilaksi ve zehirlenme olmak üzere yedi yüksek riskli desen içerir. Bu örüntüler tetiklendiğinde model, Türkiye için 112 (acil) ve 182 (intihar önleme) hatlarına yönlendirme yapan acil mesaj döndürür.
+
+\paragraph{Geri Çağırma (Retrieval):}
+Kullanıcı sorgusu önce \texttt{text-embedding-3-small} modeli ile 1536 boyutlu vektöre dönüştürülür, ardından PostgreSQL fonksiyonu \texttt{public.match\_source\_chunks} cosine benzerliği ile en alakalı 8 parçayı getirir. Yalnızca \texttt{is\_verified = true} olan kaynaklar değerlendirilir.
+
+\subsubsection{generate-health-profile: Skor ve Plan Üretimi}
+
+\texttt{generate-health-profile} servisi BMI, Mifflin--St Jeor formülüyle BMR, aktivite çarpanlarıyla TDEE hesaplar. Aktivite çarpanları: \texttt{sedentary} 1.2, \texttt{light} 1.375, \texttt{moderate} 1.55, \texttt{active} 1.725, \texttt{very\_active} 1.9. 0--100 arası sağlık skoru, BMI normal aralık (+10), düzenli öğün takibi (+10), su hedefine ulaşma (+10), aktivite (+10), uyku (+5) gibi faktörlerden oluşur. AI çağrısı başarısız olduğunda da kural-tabanlı yedek profil (fallback) döndürülmesi sağlanmıştır.
+
 \subsection{Ön Yüz Bileşen Mimarisi}
 
-İstemci tarafı, 30'dan fazla React bileşeni, 3 bağlam sağlayıcısı (context provider) ve özel kancalar (custom hooks) ile yapılandırılmıştır.
+\texttt{client/src/components/} dizininde 41 üst-düzey React bileşeni, \texttt{client/src/components/ui/} altında 53 shadcn/ui temel bileşeni yer almaktadır. Tüm sayfa düzeyinde bileşenler \texttt{App.tsx} içinde \texttt{React.lazy()} ile tembel yüklenmektedir; bu sayede ilk yükleme paket boyutu küçük tutulmuştur.
 
-\subsubsection{Navigasyon Yapısı}
+\subsubsection{Sayfa Düzeni}
 
-Alt navigasyon çubuğu (bottom navigation) 5 ana sekme içermektedir:
-
-\begin{enumerate}
-    \item \textbf{Ana Sayfa} $\rightarrow$ \texttt{HealthDashboard}: Sağlık skoru (0--100), kalori/protein/su ilerleme çemberleri, günlük öneriler,
-    \item \textbf{Günlük} $\rightarrow$ \texttt{AllLogger}: Aktivite kayıt geçmişi,
-    \item \textbf{Hızlı Ekle} $\rightarrow$ Alt sayfa: Kamera, Ses, Belge, Aktivite kısayolları,
-    \item \textbf{Koç} $\rightarrow$ \texttt{CoachHub}: Uzman Sohbet (RAG chatbot) ve Boost (takviye önerileri),
-    \item \textbf{Analiz} $\rightarrow$ \texttt{AnalysisHub}: Sağlık Profili, Giyilebilir Veri, Analitik, Takviyeler, Topluluk, Aile.
-\end{enumerate}
+\texttt{pages/AppLayout.tsx} korumalı bir kabuktur; alt rotalar (\texttt{HealthDashboard}, \texttt{AnalysisHub}, \texttt{Boost}, \texttt{ExpertChat} vb.) iç içe rotalar olarak yerleştirilmiştir. Web ortamında \texttt{BrowserRouter}, native ortamda (\texttt{Capacitor.isNativePlatform()}) \texttt{HashRouter} kullanılır. \texttt{ErrorBoundary} sınıf bileşeni rota seviyesinde tüm beklenmeyen hataları yakalayarak \enquote{Tekrar dene} aksiyonlu kullanıcı dostu bir UI sunar.
 
 \subsubsection{Durum Yönetimi}
 
-Uygulama durumu üç bağlam sağlayıcısı ile yönetilmektedir:
+Uygulama durumu üç bağlam sağlayıcısı ve TanStack Query ile yönetilmektedir:
 
 \begin{itemize}
-    \item \textbf{AuthContext:} Oturum tabanlı kimlik doğrulama durumu (\texttt{user}, \texttt{signIn}, \texttt{signUp}, \texttt{signOut}),
-    \item \textbf{HealthDataContext:} İstemci tarafı sağlık verileri (besin analizleri, sesli girişler, aktiviteler, belgeler, tıbbi fotoğraflar, günlük hedefler, su tüketimi, widget'lar). Günlük kalori ve protein toplamlarını otomatik hesaplar,
-    \item \textbf{LanguageContext:} TR/EN dil tercihi, çeviri sözlüğü (\texttt{t} fonksiyonu), yerel tarih biçimlendirme.
+    \item \textbf{AuthContext:} Supabase oturumunu (\texttt{user}, \texttt{session}) ve \texttt{signIn}/\texttt{signUp}/\texttt{signOut}/\texttt{updateProfile} işlemlerini yönetir.
+    \item \textbf{HealthDataContext:} İstemci tarafı önbellek (yemek analizleri, sesli girişler, aktiviteler, belgeler, tıbbi fotoğraflar, günlük hedefler, su tüketimi). Günlük kalori ve protein toplamlarını \texttt{useMemo} ile otomatik hesaplar.
+    \item \textbf{LanguageContext:} \texttt{tr}/\texttt{en} tercihi, \texttt{t} fonksiyonu ile çeviri sözlüğü. Marka isimleri (\enquote{Myora}, \enquote{My Score}) iki dilde de İngilizce kalır.
 \end{itemize}
 
-\subsection{Mobil Uygulama Katmanı}
+Sunucu durumu ise \texttt{TanStack React Query} ile yönetilmekte; tüm sorgu anahtarları \texttt{client/src/lib/queryKeys.ts} dosyasında merkezileştirilmiştir. \texttt{staleTime.static} ve \texttt{staleTime.dynamic} sabitleri ile farklı veri türlerine farklı önbellek ömrü uygulanmıştır.
 
-Capacitor 7.x yapılandırması ile web uygulaması yerel iOS ve Android uygulamalarına dönüştürülmektedir. Yapılandırma detayları:
+\subsubsection{Kanca (Hook) Kütüphanesi}
 
+\texttt{client/src/hooks/} altında uygulamanın yedi özel kancası bulunmaktadır:
 \begin{itemize}
-    \item \textbf{Uygulama Kimliği:} \texttt{com.myora.app}
-    \item \textbf{Uygulama Adı:} Myora
-    \item \textbf{Web Dizini:} \texttt{dist/public}
-    \item \textbf{Eklentiler:} SplashScreen (otomatik gizleme devre dışı)
-    \item \textbf{Yerel Modüller:} @capacitor/preferences (anahtar-değer depolama)
+    \item \texttt{useHealthScore}, \texttt{useStreak} -- TanStack Query ile sağlık skoru ve seri takibi.
+    \item \texttt{useHealthData} -- HealthDataContext sarmalayıcısı.
+    \item \texttt{use-mobile}, \texttt{useKeyboard} -- mobil platform algılama ve klavye davranışı.
+    \item \texttt{useTabNavigate} -- sekme bazlı navigasyon.
+    \item \texttt{use-toast} -- shadcn toast bildirimleri.
 \end{itemize}
 
-\subsection{Geliştirme Süreci}
+\subsection{Form Doğrulama ve i18n}
+
+Tüm formlar \texttt{react-hook-form} ile yönetilmekte, \texttt{@hookform/resolvers/zod} adaptörü ile Zod şemalarına bağlanmaktadır. Şemalar \texttt{client/src/lib/validations/} altında \texttt{auth.ts} ve \texttt{forms.ts} dosyalarında tanımlıdır. Çoklu dil desteği için \texttt{LanguageContext} 200'den fazla çeviri anahtarı içermekte, tip-güvenli olarak \texttt{en} ve \texttt{tr} sözlüklerinde aynı anahtar kümesi zorlanmaktadır.
+
+\subsection{Bilimsel Kaynak Yutma (RAG Ingest) Pipeline}
+
+\texttt{scripts/rag/} dizini iki TypeScript betiği içermektedir:
+\begin{itemize}
+    \item \texttt{seed-sources.ts} (581 satır) -- önceden tanımlı bilimsel kaynak meta verilerini \texttt{scientific\_sources} tablosuna yükler.
+    \item \texttt{ingest-urls.ts} (543 satır) -- URL'lerden makale içeriğini çekip parçalara böler, \texttt{text-embedding-3-small} ile gömme vektörleri üretir ve \texttt{scientific\_source\_chunks} tablosuna yazar.
+\end{itemize}
+Bu betikler \texttt{npm run rag:seed} ve \texttt{npm run rag:ingest} komutları ile çalıştırılmaktadır.
+
+\subsection{Geliştirme ve Dağıtım Süreci}
 
 Proje, aşamalı bir geliştirme sürecine tabi tutulmuştur:
 
 \begin{enumerate}
-    \item \textbf{Ocak 2025:} İlk prototip, Lovable + Supabase platformunda geliştirilmiştir.
-    \item \textbf{Ocak 2026:} Özelleştirme gereksinimleri nedeniyle Replit tam yığın ortamına (Express + Drizzle ORM) geçiş yapılmıştır.
-    \item \textbf{Şubat 2026:} Capacitor entegrasyonu ile mobil uygulama hazırlığı tamamlanmıştır.
-    \item \textbf{Şubat 2026:} UI/IA (Bilgi Mimarisi) revizyonu ile 5 sekme navigasyon yapısına geçilmiştir.
+    \item \textbf{Ocak 2025:} İlk prototip Lovable platformunda Supabase tabanlı olarak geliştirilmiştir.
+    \item \textbf{Ocak 2026:} Replit ortamına taşınmış ve geçici olarak Express tabanlı bir vites/middleware katmanı eklenmiştir; sonrasında bu katman kaldırılarak doğrudan Supabase Edge Function'larına geçiş yapılmıştır.
+    \item \textbf{Şubat 2026:} Capacitor 7 entegrasyonu ile Android paketleme tamamlanmıştır.
+    \item \textbf{Şubat 2026:} 5 sekmeli alt navigasyon, lazy yükleme ve ErrorBoundary eklenerek bilgi mimarisi ve performans iyileştirmeleri yapılmıştır.
+    \item \textbf{Mart 2026:} \texttt{rag\_chunks} ve \texttt{supplement\_tracking} migrasyonları, \texttt{ivfflat} indeksi ve RLS audit düzeltmeleri uygulanmıştır.
 \end{enumerate}
+
+\paragraph{Ortam Değişkenleri:}
+\texttt{VITE\_SUPABASE\_URL}, \texttt{VITE\_SUPABASE\_PUBLISHABLE\_KEY} (istemci); \texttt{OPENAI\_API\_KEY}, \texttt{SUPABASE\_URL}, \texttt{SUPABASE\_SERVICE\_ROLE\_KEY}, \texttt{ALLOWED\_ORIGINS} (Edge Function gizli değerleri).
+
+\paragraph{Dağıtım Komutları:}
+\texttt{npm run supabase:db:push} ile şema, \texttt{npm run supabase:functions:deploy} ile üç Edge Function tek seferde dağıtılır. Web istemci için Netlify (\texttt{netlify.toml}), Vercel (\texttt{vercel.json}) ve Railway (\texttt{railway.json}) yapılandırmaları hazırdır.
+
+\subsection{Kod Kalitesi ve Tip Güvenliği}
+
+TypeScript \texttt{strict} modu açıktır. ESLint kuralları \texttt{eslint.config.js} dosyasında flat config formatında tanımlanmıştır. \texttt{npx tsc --noEmit} ile tip kontrolü, \texttt{npm run lint} ile statik analiz çalıştırılmaktadır. Tüm bileşenlerde \texttt{any}, \texttt{getattr}/\texttt{setattr} kalıpları yerine açık tip tanımları tercih edilmiştir.

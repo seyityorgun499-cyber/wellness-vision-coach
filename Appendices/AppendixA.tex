@@ -1,165 +1,282 @@
 % ============================================================
-%  AppendixA.tex – Ek A: API Uç Noktaları Referansı
+%  AppendixA.tex – Ek A: Veritabanı ve Servis Referansı
 % ============================================================
 \appendix
-\section{API Uç Noktaları Tam Referansı}
+\section{Veritabanı Tabloları ve Servis Referansı}
 \label{app:api}
 
-Bu ekte, Myora platformunun tüm RESTful API uç noktaları listelenmektedir.
+Bu ekte, Myora platformunun gerçek arka uç altyapısı olan Supabase tarafındaki tüm veritabanı tabloları, Edge Function uç noktaları ve istemci API modülleri listelenmektedir. Listeler doğrudan \texttt{supabase/migrations/} ve \texttt{supabase/functions/} dizinlerindeki kaynak kodlardan türetilmiştir.
 
-\subsection{Kimlik Doğrulama Rotaları (\texttt{/api/auth})}
+\subsection{PostgreSQL Tabloları}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
+\caption{Migrasyon dosyaları ve içerdikleri tablolar}
+\label{tab:tables_full}
 \small
-\begin{tabular}{|l|l|l|l|}
+\begin{tabular}{|l|p{0.55\textwidth}|c|}
 \hline
-\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Kimlik} & \textbf{Açıklama} \\
+\textbf{Migrasyon} & \textbf{Tablolar} & \textbf{\#} \\
 \hline
-POST & /api/auth/register   & --      & Kayıt (email, şifre, ad) \\
-POST & /api/auth/login      & --      & Giriş \\
-POST & /api/auth/logout     & --      & Oturum sonlandırma \\
-GET  & /api/auth/me         & Oturum  & Mevcut kullanıcı bilgisi \\
-PUT  & /api/user/profile    & Oturum  & Profil güncelleme \\
+\texttt{202603110001\_profiles}            & \texttt{profiles} & 1 \\
+\texttt{202603110002\_core\_health}        & \texttt{daily\_health\_logs}, \texttt{food\_entries}, \texttt{activity\_entries}, \texttt{voice\_entries}, \texttt{health\_documents} & 5 \\
+\texttt{202603110003\_streak\_achievements}& \texttt{achievements}, \texttt{user\_achievements}, \texttt{user\_streaks} & 3 \\
+\texttt{202603110004\_goals\_community}    & \texttt{user\_goals}, \texttt{community\_posts}, \texttt{community\_comments}, \texttt{community\_likes} & 4 \\
+\texttt{202603110005\_family\_supplements} & \texttt{family\_members}, \texttt{family\_medications}, \texttt{family\_medication\_logs}, \texttt{supplements}, \texttt{supplement\_recommendations}, \texttt{supplement\_orders} & 6 \\
+\texttt{202603120001\_health\_profiles}    & \texttt{health\_profiles} & 1 \\
+\texttt{202603130001\_chat}                & \texttt{chat\_conversations}, \texttt{chat\_messages} & 2 \\
+\texttt{202603140001\_analysis\_assets}    & \texttt{blood\_tests}, \texttt{blood\_test\_results}, \texttt{medical\_photos} & 3 \\
+\texttt{202603140002\_wearables}           & \texttt{wearable\_devices}, \texttt{user\_devices}, \texttt{wearable\_data} & 3 \\
+\texttt{202603150001\_fasting}             & \texttt{fasting\_logs} & 1 \\
+\texttt{202603160001\_rag\_chunks}         & \texttt{scientific\_sources}, \texttt{scientific\_source\_chunks}, \texttt{rag\_query\_logs} & 3 \\
+\texttt{202603170001\_supplement\_tracking}& \texttt{supplement\_intake\_logs} & 1 \\
+\hline
+\textbf{Toplam} & & \textbf{33} \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Sağlık Takibi Rotaları (\texttt{/api/health})}
+\subsection{Supabase Edge Functions}
 
-\begin{table}[htbp]
+Üç adet Deno tabanlı Edge Function vardır. Tümü \texttt{POST} metodu, \texttt{Authorization: Bearer <jwt>} başlığı ve \texttt{application/json} içerik tipi ile çağrılır. Yanıtlar yapılandırılmış JSON formatındadır.
+
+\begin{table}[H]
 \centering
+\caption{Edge Function uç noktaları}
+\label{tab:edge_fns}
 \small
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|p{0.50\textwidth}|}
 \hline
-\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\textbf{Edge Function} & \textbf{Görev / Girdi--Çıktı} \\
 \hline
-GET  & /daily-log?date=          & Günlük sağlık özeti \\
-PUT  & /daily-log                & Günlük kayıt upsert \\
-GET  & /daily-log/range          & Tarih aralığı kayıtları \\
-GET  & /food-entries?date=       & Besin girişleri \\
-POST & /food-entries             & Besin girişi ekleme \\
-POST & /analyze-food             & AI yemek fotoğrafı analizi \\
-GET  & /activities?limit=        & Aktivite listesi \\
-POST & /activities               & Aktivite ekleme \\
-GET  & /fasting/active           & Aktif oruç oturumu \\
-POST & /fasting/start            & Oruç başlatma \\
-POST & /fasting/:id/end          & Oruç bitirme \\
-GET  & /fasting/history          & Oruç geçmişi \\
-GET  & /blood-tests              & Kan tahlili listesi \\
-GET  & /blood-tests/:id          & Kan tahlili detay \\
-POST & /blood-tests              & Kan tahlili yükleme + AI analiz \\
-GET  & /documents                & Sağlık belgeleri \\
-POST & /documents                & Belge yükleme + AI analiz \\
-GET  & /medical-photos           & Tıbbi fotoğraflar \\
-POST & /medical-photos           & Tıbbi fotoğraf + AI analiz \\
-GET  & /voice-entries            & Sesli girişler \\
-POST & /voice-entries            & Sesli giriş + AI analiz \\
-GET  & /goals                    & Kullanıcı hedefleri \\
-POST & /goals                    & Hedef oluşturma \\
-PUT  & /goals/:id                & Hedef güncelleme \\
-GET  & /achievements             & Kullanıcı başarımları \\
+\texttt{POST /functions/v1/analyze-health-data} &
+Çoklu kipli AI analizi. Girdi: \texttt{\{ type, ... \}} -- \texttt{type} alanı şunlardan biri: \texttt{food-image}, \texttt{blood-test}, \texttt{document}, \texttt{medical-photo} (alt türler: \texttt{urine}/\texttt{stool}/\texttt{tongue}/\texttt{eye}/\texttt{skin}), \texttt{voice-entry}, \texttt{voice-food}. Çıktı: tipe göre yapılandırılmış JSON. \\
+\hline
+\texttt{POST /functions/v1/generate-chat-response} &
+RAG chatbot 8 aşamalı pipeline. Girdi: \texttt{\{ conversationId, message \}}. Çıktı: \texttt{\{ content, citations[], suggestedFollowUps[], isHighRisk, model, latencyMs \}}. \\
+\hline
+\texttt{POST /functions/v1/generate-health-profile} &
+Sağlık profili oluşturma. Girdi: \texttt{\{ userData, todayFood, todayWater, recentActivities, todaySleep, recentBlood \}}. Çıktı: \texttt{\{ bmi, bmr, tdee, bodyFatEstimate, healthScore, riskFactors, strengths, improvementAreas, nutritionPlan, exercisePlan, sleepRecommendation, supplementRecommendations, aiSummary \}}. \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Sohbet (RAG) Rotaları (\texttt{/api/chat})}
+\subsection{PostgreSQL Fonksiyonları (RPC)}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
-\small
-\begin{tabular}{|l|l|l|}
+\caption{Veritabanı fonksiyonları}
+\label{tab:db_fns}
+\begin{tabular}{|l|p{0.55\textwidth}|}
 \hline
-\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\textbf{Fonksiyon} & \textbf{Açıklama} \\
 \hline
-GET  & /conversations                  & Sohbet listesi \\
-POST & /conversations                  & Yeni sohbet oluştur \\
-GET  & /conversations/:id/messages     & Mesaj geçmişi \\
-POST & /conversations/:id/messages     & Mesaj gönder (RAG yanıt) \\
-GET  & /health-profile                 & Sağlık profili getir \\
-POST & /health-profile/generate        & Sağlık profili üret/güncelle \\
+\texttt{public.match\_source\_chunks(query\_embedding, match\_threshold, match\_count, filter\_category, filter\_language, filter\_verified)} & RAG retrieval için cosine benzerlik araması. Edge Function'lardan \texttt{supabase.rpc('match\_source\_chunks', ...)} ile çağrılır. \\
+\texttt{public.handle\_new\_user\_profile()} & \texttt{auth.users} tablosuna yeni kayıt eklendiğinde \texttt{profiles} satırı oluşturur. \\
+\texttt{public.set\_profiles\_updated\_at()} & \texttt{profiles} güncellemelerinde \texttt{updated\_at} alanını otomatik günceller. \\
+\texttt{public.handle\_new\_user\_streak()} & Yeni kullanıcı için \texttt{user\_streaks} kaydı oluşturur. \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Takviye Gıda Rotaları (\texttt{/api/supplements})}
+\subsection{İstemci API Modülleri}
 
-\begin{table}[htbp]
+İstemci, doğrudan Supabase JS SDK üzerinden tablolarla konuşmakta ve Edge Function'ları \texttt{supabase.functions.invoke} ile çağırmaktadır. \texttt{client/src/lib/api/} altındaki 8 modül namespaced API olarak dışa aktarılmaktadır.
+
+\subsubsection{authAPI}
+
+\begin{table}[H]
 \centering
 \small
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|p{0.55\textwidth}|}
 \hline
-\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\textbf{Yöntem} & \textbf{Açıklama} \\
 \hline
-GET  & /catalog           & Takviye katalogu \\
-GET  & /recommendations   & Kişisel öneriler \\
-POST & /recommendations   & Öneri oluştur \\
-GET  & /orders            & Sipariş listesi \\
-POST & /orders            & Sipariş oluştur \\
-PUT  & /orders/:id        & Sipariş güncelle \\
+\texttt{authAPI.signUp(email, password, displayName)} & Yeni kullanıcı kaydı (Supabase \texttt{auth.signUp}) \\
+\texttt{authAPI.signIn(email, password)} & Oturum açma \\
+\texttt{authAPI.signOut()}                & Oturum sonlandırma \\
+\texttt{authAPI.getSession()}             & Aktif oturumu döndürür \\
+\texttt{authAPI.getProfile()}             & \texttt{profiles} satırını getirir \\
+\texttt{authAPI.updateProfile(patch)}     & Profil bilgilerini günceller \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Topluluk Rotaları (\texttt{/api/community})}
+\subsubsection{healthAPI}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \small
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|p{0.55\textwidth}|}
 \hline
-\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\textbf{Yöntem} & \textbf{Açıklama} \\
 \hline
-GET  & /posts             & Gönderi listesi \\
-GET  & /posts/:id         & Gönderi detay \\
-POST & /posts             & Gönderi oluştur \\
-GET  & /posts/:id/comments& Yorumlar \\
-POST & /posts/:id/comments& Yorum ekle \\
-POST & /posts/:id/like    & Beğeni toggle \\
-DELETE& /posts/:id        & Gönderi sil \\
+\texttt{healthAPI.getDailyLog(date)}            & Günlük sağlık özeti \\
+\texttt{healthAPI.upsertDailyLog(payload)}      & Günlük log upsert \\
+\texttt{healthAPI.getDailyLogRange(start, end)} & Tarih aralığında loglar \\
+\texttt{healthAPI.listFoodEntries(date)}        & Besin girişleri \\
+\texttt{healthAPI.addFoodEntry(payload)}        & Besin girişi ekleme \\
+\texttt{healthAPI.analyzeFoodImage(imageData)}  & GPT-4o vision yemek analizi (edge fn) \\
+\texttt{healthAPI.listActivities(limit)}        & Aktivite listesi \\
+\texttt{healthAPI.addActivity(payload)}         & Aktivite ekleme \\
+\texttt{healthAPI.getActiveFasting()}           & Aktif oruç oturumu \\
+\texttt{healthAPI.startFasting(plan)}           & Oruç başlatma \\
+\texttt{healthAPI.endFasting(id)}               & Oruç bitirme \\
+\texttt{healthAPI.getFastingHistory()}          & Oruç geçmişi \\
+\texttt{healthAPI.listBloodTests()}             & Kan tahlili listesi \\
+\texttt{healthAPI.getBloodTest(id)}             & Kan tahlili + sonuçlar \\
+\texttt{healthAPI.uploadBloodTest(payload)}     & Kan tahlili yükleme + AI analiz \\
+\texttt{healthAPI.listDocuments()}              & Sağlık belgeleri \\
+\texttt{healthAPI.uploadDocument(payload)}      & Belge yükleme + AI analiz \\
+\texttt{healthAPI.listMedicalPhotos()}          & Tıbbi fotoğraflar \\
+\texttt{healthAPI.uploadMedicalPhoto(payload)}  & Tıbbi fotoğraf + AI analiz \\
+\texttt{healthAPI.listVoiceEntries()}           & Sesli girişler \\
+\texttt{healthAPI.addVoiceEntry(payload)}       & Sesli giriş + AI analiz \\
+\texttt{healthAPI.listGoals() / addGoal / updateGoal} & Hedef CRUD \\
+\texttt{healthAPI.listAchievements()}           & Kullanıcı başarımları \\
+\texttt{healthAPI.getStreak()}                  & Günlük seri (streak) \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Aile Takibi Rotaları (\texttt{/api/family})}
+\subsubsection{chatAPI}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \small
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|p{0.55\textwidth}|}
 \hline
-\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\textbf{Yöntem} & \textbf{Açıklama} \\
 \hline
-GET  & /members                          & Aile üyeleri \\
-POST & /members                          & Üye ekle \\
-PUT  & /members/:id                      & Üye güncelle \\
-DELETE& /members/:id                     & Üye sil \\
-GET  & /members/:id/medications          & İlaçlar \\
-POST & /members/:id/medications          & İlaç ekle \\
-PUT  & /medications/:id                  & İlaç güncelle \\
-DELETE& /medications/:id                 & İlaç sil \\
-GET  & /medications/:id/logs             & İlaç kayıtları \\
-POST & /medications/:id/logs             & İlaç kaydı ekle \\
-GET  & /members/:id/adherence            & Uyum oranı \\
+\texttt{chatAPI.listConversations()}              & Sohbet listesi \\
+\texttt{chatAPI.createConversation(title)}        & Yeni sohbet \\
+\texttt{chatAPI.listMessages(conversationId)}     & Mesaj geçmişi \\
+\texttt{chatAPI.sendMessage(conversationId, content)} & Mesaj gönder, RAG yanıtı al (edge fn) \\
+\texttt{chatAPI.getHealthProfile()}               & Mevcut sağlık profili \\
+\texttt{chatAPI.regenerateHealthProfile()}        & Sağlık profili üret/yenile (edge fn) \\
 \hline
 \end{tabular}
 \end{table}
 
-\subsection{Giyilebilir Cihaz Rotaları (\texttt{/api/wearables})}
+\subsubsection{supplementAPI}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \small
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|p{0.55\textwidth}|}
 \hline
-\textbf{Metot} & \textbf{Uç Nokta} & \textbf{Açıklama} \\
+\textbf{Yöntem} & \textbf{Açıklama} \\
 \hline
-GET  & /devices              & Cihaz katalogu \\
-GET  & /user-devices         & Kullanıcı cihazları \\
-POST & /user-devices         & Cihaz bağla \\
-DELETE& /user-devices/:id    & Cihaz çıkar \\
-GET  & /data                 & Giyilebilir veri \\
-POST & /data/sync            & Veri senkronizasyonu \\
+\texttt{supplementAPI.listCatalog()}              & Takviye katalogu \\
+\texttt{supplementAPI.listRecommendations()}      & Kişisel öneriler \\
+\texttt{supplementAPI.requestRecommendations()}   & AI öneri üretimi \\
+\texttt{supplementAPI.listOrders()}               & Sipariş listesi \\
+\texttt{supplementAPI.createOrder(payload)}       & Sipariş oluştur \\
+\texttt{supplementAPI.updateOrder(id, status)}    & Sipariş güncelle \\
+\texttt{supplementAPI.logIntake(payload)}         & Alım kaydı ekle \\
+\texttt{supplementAPI.listIntakeLogs(range)}      & Alım kayıtları \\
 \hline
 \end{tabular}
 \end{table}
+
+\subsubsection{communityAPI}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{0.55\textwidth}|}
+\hline
+\textbf{Yöntem} & \textbf{Açıklama} \\
+\hline
+\texttt{communityAPI.listPosts(filter)}                 & Gönderi listesi \\
+\texttt{communityAPI.getPost(id)}                       & Gönderi detayı \\
+\texttt{communityAPI.createPost(payload)}               & Gönderi oluştur \\
+\texttt{communityAPI.deletePost(id)}                    & Gönderi sil \\
+\texttt{communityAPI.listComments(postId)}              & Yorumlar \\
+\texttt{communityAPI.addComment(postId, content)}       & Yorum ekle \\
+\texttt{communityAPI.toggleLike(postId)}                & Beğeni toggle \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{familyAPI}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{0.55\textwidth}|}
+\hline
+\textbf{Yöntem} & \textbf{Açıklama} \\
+\hline
+\texttt{familyAPI.listMembers()}                          & Aile üyeleri \\
+\texttt{familyAPI.addMember(payload)}                     & Üye ekle \\
+\texttt{familyAPI.updateMember(id, patch)}                & Üye güncelle \\
+\texttt{familyAPI.deleteMember(id)}                       & Üye sil \\
+\texttt{familyAPI.listMedications(memberId)}              & İlaçlar \\
+\texttt{familyAPI.addMedication(memberId, payload)}       & İlaç ekle \\
+\texttt{familyAPI.updateMedication(id, patch)}            & İlaç güncelle \\
+\texttt{familyAPI.deleteMedication(id)}                   & İlaç sil \\
+\texttt{familyAPI.listMedicationLogs(medId, range)}       & Alım kayıtları \\
+\texttt{familyAPI.addMedicationLog(medId, payload)}       & Alım kaydı ekle \\
+\texttt{familyAPI.computeAdherence(memberId, range)}      & Uyum oranı hesapla \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{wearableAPI}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{0.55\textwidth}|}
+\hline
+\textbf{Yöntem} & \textbf{Açıklama} \\
+\hline
+\texttt{wearableAPI.listDevices()}            & Cihaz katalogu \\
+\texttt{wearableAPI.listUserDevices()}        & Kullanıcı cihazları \\
+\texttt{wearableAPI.connectDevice(payload)}   & Cihaz bağla \\
+\texttt{wearableAPI.disconnectDevice(id)}     & Cihaz çıkar \\
+\texttt{wearableAPI.listData(range)}          & Giyilebilir veri \\
+\texttt{wearableAPI.syncData(payload)}        & Veri senkronizasyonu \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{notificationAPI \& challengeAPI}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{0.55\textwidth}|}
+\hline
+\textbf{Yöntem} & \textbf{Açıklama} \\
+\hline
+\texttt{notificationAPI.getPreferences()}    & Kullanıcı bildirim tercihleri \\
+\texttt{notificationAPI.updatePreferences(p)}& Tercihleri güncelle \\
+\texttt{challengeAPI.listWeeklyChallenges()} & Haftalık görevler \\
+\texttt{challengeAPI.completeChallenge(id)}  & Görev tamamla \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Önemli SQL Şema Tanımları}
+
+\paragraph{\texttt{scientific\_source\_chunks} (RAG vector tablo):}
+\begin{itemize}
+\item \texttt{id uuid PK}, \texttt{source\_id uuid FK $\to$ scientific\_sources}, \texttt{chunk\_index integer}, \texttt{section text},
+\item \texttt{content text NOT NULL}, \texttt{token\_count integer}, \texttt{embedding extensions.vector(1536)},
+\item \texttt{keywords text[]}, \texttt{language text}, \texttt{created\_at timestamptz}.
+\item İndeks: \texttt{idx\_chunks\_embedding using ivfflat (embedding extensions.vector\_cosine\_ops) with (lists = 50)}.
+\end{itemize}
+
+\paragraph{\texttt{rag\_query\_logs}:}
+\begin{itemize}
+\item Kullanıcı sorgusu, getirilen parça kimlikleri (\texttt{retrieved\_chunk\_ids uuid[]}), benzerlik skorları (\texttt{similarity\_scores numeric[]}),
+\item Kullanılan bağlam blokları (\texttt{context\_blocks\_used text[]}), model adı, gecikme (\texttt{latency\_ms integer}).
+\end{itemize}
+
+\paragraph{\texttt{daily\_health\_logs}:}
+\begin{itemize}
+\item Bileşik benzersizlik: \texttt{UNIQUE(user\_id, date)}.
+\item Varsayılan hedefler: \texttt{calories\_target=2100}, \texttt{protein\_target=180}, \texttt{water\_target=2400 mL}, \texttt{steps\_target=10\,000}, \texttt{sleep\_target=480 dk}.
+\end{itemize}

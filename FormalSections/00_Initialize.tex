@@ -1,5 +1,82 @@
 % ============================================================
-%  00_Initialize.tex – Değişken Tanımları
+%  00_Initialize.tex – Paket içe aktarımları ve değişken tanımları
+% ============================================================
+
+% --- LaTeX Paketleri (OTUMF-BPSablonu standart paket listesi) ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[turkish]{babel}
+\usepackage{csquotes}
+\usepackage{blindtext}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{rotating}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{enumitem,amssymb}
+\usepackage{times}
+\usepackage{tikz}
+\usepackage[space]{grffile}
+\usepackage{array}
+\usepackage{pifont}
+\usepackage{changepage}
+\usepackage{commath}
+\usepackage{tabularx}
+\usepackage{morefloats}
+\usepackage[dvi]{totpages}
+\usepackage[tbtags]{mathtools}
+\usepackage[square, sort&compress,comma,numbers]{natbib}
+\usepackage{ragged2e}
+\usepackage[none]{hyphenat}
+\usepackage{xr}
+\usepackage{afterpage}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyhdr}
+
+\renewcommand{\textfraction}{0.10}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\floatpagefraction}{0.35}
+
+\graphicspath{{./Figures/}}
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\hypersetup{urlcolor=black, colorlinks=true}
+\newcommand{\ie}{\textit{i}.\textit{e}. }
+\newcommand{\xmark}{\ding{55}}
+\usetikzlibrary{spy,calc,shapes,positioning}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+% ============================================================
+%  Proje Değişkenleri
 % ============================================================
 
 % --- Başlık ---
@@ -12,7 +89,7 @@
 
 % --- Bölüm / Üniversite ---
 \newcommand{\dept}{Yazılım Mühendisliği}
-\newcommand{\faculty}{Mühendislik ve Mimarlık Fakültesi}
+\newcommand{\faculty}{Mühendislik Fakültesi}
 \newcommand{\university}{OSTİM Teknik Üniversitesi}
 \newcommand{\univcity}{Ankara}
 
@@ -27,7 +104,7 @@
 % --- Anahtar Kelimeler ---
 \newcommand{\keywordsTR}{%
   Yapay Zekâ, Mobil Sağlık Uygulaması, RAG Chatbot, GPT-4o,
-  Beslenme Analizi, Kan Tahlili, React, Node.js, PostgreSQL}
+  Beslenme Analizi, Kan Tahlili, React, Supabase, PostgreSQL, pgvector}
 \newcommand{\keywordsEN}{%
   Artificial Intelligence, Mobile Health Application, RAG Chatbot, GPT-4o,
-  Nutrition Analysis, Blood Test, React, Node.js, PostgreSQL}
+  Nutrition Analysis, Blood Test, React, Supabase, PostgreSQL, pgvector}

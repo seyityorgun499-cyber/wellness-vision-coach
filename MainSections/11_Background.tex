@@ -55,8 +55,8 @@ SPA mimarisi, sunucudan tek bir HTML sayfası yükleyerek kullanıcı etkileşim
 \subsubsection{RESTful API Tasarımı}
 REST (Representational State Transfer), istemci-sunucu iletişiminde kaynak odaklı bir mimari stildir. HTTP metotları (GET, POST, PUT, DELETE) ile CRUD operasyonları gerçekleştirilmekte, JSON formatında veri alışverişi yapılmaktadır~\cite{Fielding2000}.
 
-\subsubsection{ORM ve Tip-Güvenli Veritabanı Erişimi}
-Object-Relational Mapping (ORM), veritabanı tablolarını programlama dili nesnelerine eşleyerek SQL sorgularını soyutlayan bir tekniktir. Drizzle ORM, TypeScript'in tip sistemi ile tam uyumlu çalışarak derleme zamanında (compile-time) sorgu hatalarını yakalayabilmektedir~\cite{DrizzleORM2024}.
+\subsubsection{Backend-as-a-Service (BaaS) ve Supabase}
+Backend-as-a-Service mimarisi, kimlik doğrulama, veritabanı, depolama ve sunucusuz fonksiyonlar gibi temel arka uç servislerini bir platform olarak sunarak geliştirme süresini kısaltmaktadır. Supabase, PostgreSQL üzerine kurulu, tüm hizmetlerini açık kaynaklı sunan ve Row Level Security (RLS) ile veritabanı düzeyinde yetkilendirme sağlayan bir BaaS platformudur~\cite{Supabase2024}. Edge Function'lar Deno çalışma zamanında çalışan, TypeScript ile yazılan sunucusuz fonksiyonlardır~\cite{Deno2024}.
 
 \subsection{Hibrit Mobil Uygulama Geliştirme}
 
@@ -73,4 +73,4 @@ Hibrit mobil uygulama geliştirme, web teknolojileri (HTML, CSS, JavaScript) ile
 
 PostgreSQL, ACID uyumlu, açık kaynaklı ve nesne-ilişkisel bir veritabanı yönetim sistemidir. JSON/JSONB veri tipi desteği, tam metin arama, dizin (index) optimizasyonları ve genişletilebilir tip sistemi ile modern web uygulamalarında yaygın olarak tercih edilmektedir~\cite{PostgreSQL2024}.
 
-Myora'nın veritabanı şeması, normalleştirme ilkelerine (3NF) uygun olarak tasarlanmış olup 17'den fazla tablo ve bunlar arasındaki yabancı anahtar (foreign key) ilişkilerini kapsamaktadır. JSONB veri tipi, yapılandırılmış AI yanıtlarının (risk faktörleri, beslenme planı, egzersiz planı vb.) esnek bir şekilde depolanmasında kullanılmıştır.
+Myora'nın veritabanı şeması, normalleştirme ilkelerine (3NF) uygun olarak tasarlanmış olup 14 SQL migrasyon dosyası üzerinden 33 tablo ve bunlar arasındaki yabancı anahtar (foreign key) ilişkilerini kapsamaktadır. JSONB veri tipi, yapılandırılmış AI yanıtlarının (risk faktörleri, beslenme planı, egzersiz planı vb.) esnek bir şekilde depolanmasında kullanılmıştır. Bilimsel kaynak metinleri, \texttt{pgvector} eklentisi ile 1536 boyutlu \texttt{text-embedding-3-small} gömme vektörleri olarak depolanmakta, \texttt{ivfflat} indeksi üzerinde cosine benzerlik araması yapılmaktadır~\cite{pgvector2024}.
