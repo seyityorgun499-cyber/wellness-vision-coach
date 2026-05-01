@@ -1,0 +1,255 @@
+\documentclass[final]{beamer}
+
+\usepackage[orientation=portrait,size=custom,width=70,height=100,scale=1.0]{beamerposter}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[turkish]{babel}
+\AtBeginDocument{\shorthandoff{=!:}}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,babel}
+
+\definecolor{myoraBlue}{HTML}{2563EB}
+\definecolor{myoraCyan}{HTML}{11B8AE}
+\definecolor{myoraGreen}{HTML}{10B981}
+\definecolor{myoraPurple}{HTML}{7C3AED}
+\definecolor{myoraOrange}{HTML}{F59E0B}
+\definecolor{myoraRed}{HTML}{EF4444}
+\definecolor{myoraInk}{HTML}{0F172A}
+\definecolor{myoraMuted}{HTML}{475569}
+\definecolor{myoraPanel}{HTML}{F8FAFC}
+\definecolor{myoraLine}{HTML}{CBD5E1}
+\definecolor{myoraSoft}{HTML}{EEF8F8}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{block title}{fg=white,bg=myoraBlue}
+\setbeamercolor{block body}{fg=myoraInk,bg=myoraPanel}
+\setbeamerfont{block title}{size=\Large,series=\bfseries}
+\setbeamerfont{block body}{size=\normalsize}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.32em}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcommand{\posterpath}{.}
+
+\newenvironment{posterblock}[1]{%
+  \begin{block}{#1}\justifying\small
+}{%
+  \end{block}
+}
+
+\newcommand{\tagpill}[2]{\fcolorbox{#1}{white}{\scriptsize #2}}
+
+\newcommand{\metricbox}[3]{\fcolorbox{#1}{white}{\begin{minipage}{4.2cm}\centering\textcolor{#1}{\fontsize{19}{21}\selectfont\bfseries #2}\\[-2pt]{\scriptsize #3}\end{minipage}}}
+
+\newcommand{\photobox}[3]{%
+  \fcolorbox{myoraLine}{white}{%
+    \begin{minipage}{0.94\linewidth}
+    \textcolor{#1}{\Large\bfseries #2}\hspace{0.6cm}\textbf{#3}\\[-2pt]
+    {\tiny\textcolor{myoraMuted}{Fotoğraf: Overleaf'te eklenebilir}}
+    \end{minipage}}%
+}
+
+\newcommand{\phoneimage}[2]{%
+  \begin{minipage}{0.30\linewidth}
+    \centering\fcolorbox{myoraInk}{myoraInk}{\includegraphics[height=10.85cm]{#1}}\\[-1pt]
+    {\bfseries\scriptsize #2}
+  \end{minipage}%
+}
+
+\title{Myora: Yapay Zekâ Destekli Mobil Sağlık ve Beslenme Yönetim Platformu Geliştirilmesi}
+\author{Seyit Ali YORGUN - 220205014}
+\institute{OSTİM Teknik Üniversitesi, Mühendislik Fakültesi, Yazılım Mühendisliği}
+\date{2026}
+
+\begin{document}
+\begin{frame}[t]
+
+\begin{beamercolorbox}[wd=\paperwidth,sep=1.2cm,leftskip=0.8cm,rightskip=0.8cm]{block title}
+{\fontsize{42}{46}\selectfont\bfseries Myora}\\[0.22cm]
+{\fontsize{22}{26}\selectfont Yapay Zekâ Destekli Mobil Sağlık ve Beslenme Yönetim Platformu Geliştirilmesi}\\[0.32cm]
+{\large Akademik Proje Posteri - 70 $\times$ 100 cm}\hfill
+\raisebox{-0.8cm}{\includegraphics[width=7.2cm]{\posterpath/../client/src/assets/myora-logo.png}}\\[0.35cm]
+{\large \textbf{Öğrenci:} Seyit Ali YORGUN \quad \textbf{No:} 220205014 \quad \textbf{Danışman:} Dr. Öğr. Üyesi Can GÜLDÜREN}
+\end{beamercolorbox}
+
+
+\vspace*{0.45cm}
+
+\begin{columns}[t,totalwidth=\textwidth]
+
+\begin{column}{0.31\textwidth}
+
+\begin{posterblock}{Problem Tanımı}
+Kişisel sağlık verileri yemek takibi, kan tahlili, giyilebilir cihaz, ilaç-takviye, aile takibi ve günlük alışkanlıklar arasında dağınık kalmaktadır. Kullanıcılar bu verileri tek bakışta yorumlamakta ve güvenilir, kaynaklı öneriye dönüştürmekte zorlanır.
+
+\textbf{Temel ihtiyaç:} mobil cihazdan kolay veri girişi, bütüncül sağlık profili, anlaşılır analiz ve sürdürülebilir davranış değişikliği desteği.
+\end{posterblock}
+
+\begin{posterblock}{Proje Hedefleri}
+\begin{itemize}\setlength\itemsep{0.22em}
+  \item Sağlık, beslenme ve aktivite verilerini tek mobil platformda toplamak.
+  \item AI destekli sağlık skoru, profil ve kişiselleştirilmiş öneriler üretmek.
+  \item RAG yaklaşımıyla kaynak gösteren sağlık sohbet asistanı sunmak.
+  \item Kan tahlili, tıbbi fotoğraf, yemek fotoğrafı ve sesli günlük analizi sağlamak.
+  \item Aile takibi, takviye önerileri, bildirimler ve gamifikasyon ile süreklilik oluşturmak.
+\end{itemize}
+\vspace{0.15cm}
+\tagpill{myoraBlue}{Mobil öncelikli}\hfill
+\tagpill{myoraGreen}{Kişiselleştirme}\hfill
+\tagpill{myoraPurple}{Kaynaklı AI}\hfill
+\tagpill{myoraOrange}{MVP odaklı}
+\end{posterblock}
+
+\begin{posterblock}{Ekip ve Danışman}
+\photobox{myoraBlue}{SY}{\large Seyit Ali YORGUN\\[-1pt]{\small Proje geliştirici - Full-stack mobil uygulama}\\{\scriptsize React, Supabase, AI servisleri, rapor ve sunum hazırlığı}}
+
+\vspace{0.35cm}
+\photobox{myoraCyan}{CG}{\large Dr. Öğr. Üyesi Can GÜLDÜREN\\[-1pt]{\small Danışman Öğretim Üyesi}\\{\scriptsize Akademik yönlendirme ve proje değerlendirme}}
+
+\vspace{0.35cm}
+{\scriptsize\textcolor{myoraMuted}{Not: Danışman ve grup üyesi portreleri sağlandığında dairesel fotoğraf alanları aynı konumda görsellerle değiştirilebilir.}}
+\end{posterblock}
+
+\begin{posterblock}{Proje Çıktıları}
+\centering
+\metricbox{myoraBlue}{32}{PostgreSQL tablo} \hfill
+\metricbox{myoraGreen}{96}{React bileşeni} \hfill
+\metricbox{myoraPurple}{3}{Edge Function}
+\vspace{0.35cm}
+
+\begin{tabularx}{\linewidth}{@{}lY@{}}
+\toprule
+\textbf{Katman} & \textbf{Çıktı} \\
+\midrule
+Mobil & Capacitor tabanlı Android-iOS uyumlu hibrit uygulama \\
+Web & Vite + React 18 + TypeScript SPA \\
+Veri & Supabase Auth, PostgreSQL, pgvector, Storage \\
+AI & GPT-4o ve RAG chatbot, analiz edge function'ları \\
+\bottomrule
+\end{tabularx}
+\end{posterblock}
+
+\end{column}
+
+\begin{column}{0.37\textwidth}
+
+\begin{posterblock}{Yazılım Modeli: Context Diagram}
+\centering
+\begin{tabularx}{\linewidth}{@{}p{4.3cm}Yp{4.8cm}@{}}
+\toprule
+\textbf{Aktör / Sistem} & \textbf{Myora Platformu} & \textbf{Dış Servis / Veri} \\
+\midrule
+Kullanıcı & Mobil uygulama üzerinden yemek, aktivite, belge, ses ve hedef verisi girer. & Supabase Auth ile güvenli oturum \\
+Aile üyeleri & İlaç, takviye ve sağlık rutini takibi için ilişkili kayıtlar üretir. & PostgreSQL tabloları ve bildirimler \\
+Giyilebilir cihaz & Adım, nabız, uyku, stres ve HRV verileri profil ile birleştirilir. & Wearable API entegrasyonu \\
+AI servisleri & Sağlık profili, RAG sohbeti, yemek ve belge analizi üretir. & GPT-4o ve pgvector kaynak araması \\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.35cm}
+\fcolorbox{myoraLine}{white}{\begin{minipage}{0.88\linewidth}
+\centering
+Kullanıcı $\rightarrow$ Myora Mobil Platformu $\rightarrow$ Supabase Veri Katmanı\\
+Myora Mobil Platformu $\rightarrow$ GPT-4o + RAG Analiz $\rightarrow$ Kaynaklı öneri ve yanıt
+\end{minipage}}
+\end{posterblock}
+
+\begin{posterblock}{Katmanlı Mimari}
+\centering
+\begin{tabularx}{0.96\linewidth}{@{}p{4.8cm}Y@{}}
+\toprule
+\textbf{Katman} & \textbf{Teknoloji ve sorumluluk} \\
+\midrule
+Sunum & React 18, Vite, Tailwind, shadcn-ui ve React Router ile mobil öncelikli arayüz \\
+Uygulama & TanStack Query, Context API, i18n ve Zod tabanlı validasyon \\
+Servis & Supabase API, Auth, Storage ve Edge Functions çağrıları \\
+AI-Veri & PostgreSQL, pgvector, GPT-4o, RAG kaynakları ve analiz çıktıları \\
+\bottomrule
+\end{tabularx}
+\end{posterblock}
+
+\begin{posterblock}{Temel Modüller}
+\begin{tabularx}{\linewidth}{@{}p{5.6cm}Y@{}}
+\toprule
+\textbf{Modül} & \textbf{İşlev} \\
+\midrule
+Sağlık Paneli & My Score, su, kalori, protein, aktivite ve günlük görev takibi \\
+AI Analiz & Yemek fotoğrafı, kan tahlili, tıbbi fotoğraf ve sesli günlük yorumlama \\
+RAG Chatbot & Kullanıcı profili ve güvenilir kaynak parçalarıyla bağlamsal yanıt \\
+Ekosistem & Takviye mağazası, topluluk, aile takibi, bildirim ve başarımlar \\
+Mobil Köprü & Kamera, mikrofon, dosya seçici ve haptik geri bildirim entegrasyonu \\
+\bottomrule
+\end{tabularx}
+\end{posterblock}
+
+\begin{posterblock}{Yöntem ve Teknolojiler}
+\begin{itemize}\setlength\itemsep{0.18em}
+  \item \textbf{Frontend:} React 18 SPA, TypeScript, Vite + SWC, Tailwind CSS.
+  \item \textbf{Backend:} Supabase Auth, PostgreSQL, Storage, Row Level Security yaklaşımı.
+  \item \textbf{AI:} Supabase Edge Functions üzerinden GPT-4o ve RAG akışı.
+  \item \textbf{Mobil:} Capacitor 7 ile Android-iOS hibrit uygulama paketi.
+  \item \textbf{Proje yönetimi:} GitHub sürüm kontrolü ve iteratif geliştirme kanıtları rapor/sunuma eklenebilir.
+\end{itemize}
+\end{posterblock}
+
+\end{column}
+
+\begin{column}{0.29\textwidth}
+
+\begin{posterblock}{Yazılımdan Ekran Görüntüleri}
+\centering
+\phoneimage{\posterpath/screenshots/dashboard-screen.png}{Ana sağlık paneli}\hfill
+\phoneimage{\posterpath/screenshots/analysis-screen.png}{Analiz merkezi}\hfill
+\phoneimage{\posterpath/screenshots/auth-screen.png}{Giriş ekranı}
+\vspace{0.35cm}
+
+{\scriptsize\textcolor{myoraMuted}{Görseller yerel MVP arayüzünden alınmıştır; gerçek jüri demosu için canlı veriyle güncellenebilir.}}
+\end{posterblock}
+
+\begin{posterblock}{Basit ve Etkileyici Tasarım Yaklaşımı}
+\begin{itemize}\setlength\itemsep{0.20em}
+  \item Sade beyaz, teal ve indigo renk paleti Myora marka kimliğiyle uyumlu seçildi.
+  \item AI destekli poster kurgusu: problem, hedef, model, ürün ekranı ve çıktı akışı.
+  \item Büyük başlık, kısa metin blokları ve yüksek kontrastlı diyagramlar uzaktan okunabilirliği artırır.
+  \item 70 $\times$ 100 cm dikey format, Overleaf'te doğrudan PDF üretmeye uygundur.
+\end{itemize}
+\end{posterblock}
+
+\begin{posterblock}{Sonuç ve Katkı}
+Myora, sağlık yönetimini yalnızca kayıt tutma düzeyinden çıkarıp kişiselleştirilmiş, mobil ve AI destekli bir karar destek deneyimine dönüştürür. MVP; kullanıcı girişi, sağlık skoru, analiz merkezi, RAG tabanlı danışmanlık ve modüler Supabase altyapısıyla genişletilebilir bir temel sunar.
+
+\vspace{0.15cm}
+\textbf{Beklenen etki:} kullanıcı farkındalığını artırmak, sağlıklı alışkanlıkları sürdürülebilir hale getirmek ve dağınık sağlık verilerini tek anlaşılır panelde birleştirmek.
+\end{posterblock}
+
+\begin{posterblock}{Sunum ve Teslim Notları}
+\begin{itemize}\setlength\itemsep{0.18em}
+  \item Poster: 70 $\times$ 100 cm PDF, Overleaf üzerinde derlenebilir.
+  \item Sunum: 15 dakika; problem, hedefler, mimari, MVP demosu ve sonuçlar önerilir.
+  \item Rapor: PDF formatında hazırlanmalı; GitHub bağlantısı ve proje yönetim kanıtları eklenebilir.
+  \item Jüri günü: en az 3 basılı rapor kopyası ve ekip üyeleri için ek kopyalar önerilir.
+\end{itemize}
+\end{posterblock}
+
+\begin{posterblock}{Kaynak ve Bağlantılar}
+\small
+\textbf{GitHub:} \url{https://github.com/seyityorgun499-cyber/wellness-vision-coach}\\
+\textbf{Anahtar kelimeler:} Yapay Zekâ, Mobil Sağlık, RAG Chatbot, GPT-4o, Supabase, React, PostgreSQL, pgvector.
+\end{posterblock}
+
+\end{column}
+
+\end{columns}
+
+\end{frame}
+\end{document}
